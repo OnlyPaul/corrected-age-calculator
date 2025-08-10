@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate corrected age and postmenstrual age for preterm infants. A medical tool for healthcare professionals and parents.">
+    <meta name="keywords" content="corrected age, adjusted age, postmenstrual age, preterm infant, gestational age, neonatal calculator">
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self'; 
+                   script-src 'self' 'unsafe-inline'; 
+                   style-src 'self' 'unsafe-inline';
+                   img-src 'self' data:;">
+    
+    <title>Corrected Age Calculator - Medical Tool for Preterm Infants</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="alternate icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%232563eb' rx='6'/><text x='16' y='22' font-family='system-ui' font-size='20' font-weight='bold' text-anchor='middle' fill='white'>🍼</text></svg>">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="js/calculator.js" as="script">
+    <link rel="preload" href="js/ui.js" as="script">
+</head>
+<body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="header" role="banner">
+        <div class="header-container">
+            <h1 class="app-title">
+                <span class="icon" aria-hidden="true">🍼</span>
+                Corrected Age Calculator
+            </h1>
+            <button type="button" 
+                    class="help-toggle" 
+                    aria-expanded="false" 
+                    aria-controls="help-panel"
+                    title="Toggle help information">
+                <span class="help-icon" aria-hidden="true">?</span>
+                <span class="sr-only">Help</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-container" role="main">
+        <!-- Help Panel -->
+        <aside id="help-panel" class="help-panel" role="complementary" aria-hidden="true">
+            <div class="help-content">
+                <h2>About This Calculator</h2>
+                <div class="help-section">
+                    <h3>What is Corrected Age?</h3>
+                    <p>Corrected age (also called adjusted age) is the age a preterm infant would be if they had been born at full term (40 weeks gestation). It's used to assess whether preterm infants are meeting developmental milestones appropriately.</p>
+                </div>
+                <div class="help-section">
+                    <h3>What is Postmenstrual Age?</h3>
+                    <p>Postmenstrual age (PMA) is the time elapsed since the onset of the mother's last menstrual period. It combines gestational age at birth with the time since birth.</p>
+                </div>
+                <div class="help-section">
+                    <h3>How to Use</h3>
+                    <ol>
+                        <li>Enter your baby's date of birth</li>
+                        <li>Enter the gestational age at birth (weeks and days)</li>
+                        <li>Optionally set a custom calculation date (defaults to today)</li>
+                        <li>Click "Calculate Ages" to see results</li>
+                    </ol>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Calculator Form -->
+        <section class="calculator-section" aria-label="Age Calculator">
+            <form id="age-calculator-form" class="calculator-form" novalidate>
+                <!-- Input Section -->
+                <div class="input-section">
+                    <h2 class="section-title">Input Information</h2>
+                    
+                    <!-- Birth Date Input -->
+                    <div class="input-group">
+                        <label for="birth-date" class="input-label">
+                            <span class="label-icon" aria-hidden="true">📅</span>
+                            Date of Birth
+                            <span class="required" aria-label="required">*</span>
+                        </label>
+                        <input type="date" 
+                               id="birth-date" 
+                               name="birthDate"
+                               class="date-input" 
+                               required 
+                               aria-describedby="birth-date-help birth-date-error">
+                        <div id="birth-date-help" class="input-help">
+                            Enter when your baby was born
+                        </div>
+                        <div id="birth-date-error" class="field-error" role="alert" aria-live="polite"></div>
+                    </div>
+
+                    <!-- Gestational Age Input -->
+                    <div class="input-group">
+                        <fieldset class="gestational-fieldset">
+                            <legend class="input-label">
+                                <span class="label-icon" aria-hidden="true">🤱</span>
+                                Gestational Age at Birth
+                                <span class="required" aria-label="required">*</span>
+                            </legend>
+                            <div class="gestational-inputs">
+                                <div class="gestational-weeks">
+                                    <label for="gestational-weeks" class="sr-only">Gestational weeks</label>
+                                    <input type="number" 
+                                           id="gestational-weeks" 
+                                           name="gestationalWeeks"
+                                           class="number-input" 
+                                           min="20" 
+                                           max="44" 
+                                           required
+                                           placeholder="32"
+                                           aria-describedby="gestational-help gestational-error">
+                                    <span class="input-suffix">weeks</span>
+                                </div>
+                                <div class="gestational-days">
+                                    <label for="gestational-days" class="sr-only">Gestational days</label>
+                                    <input type="number" 
+                                           id="gestational-days" 
+                                           name="gestationalDays"
+                                           class="number-input" 
+                                           min="0" 
+                                           max="6" 
+                                           required
+                                           placeholder="4"
+                                           aria-describedby="gestational-help">
+                                    <span class="input-suffix">days</span>
+                                </div>
+                            </div>
+                            <div id="gestational-help" class="input-help">
+                                Enter gestational age at birth (20-44 weeks + 0-6 days)
+                            </div>
+                            <div id="gestational-error" class="field-error" role="alert" aria-live="polite"></div>
+                        </fieldset>
+                    </div>
+
+                    <!-- Current Date Input -->
+                    <div class="input-group">
+                        <label for="current-date" class="input-label">
+                            <span class="label-icon" aria-hidden="true">📅</span>
+                            Calculation Date
+                        </label>
+                        <div class="date-option-group">
+                            <label class="radio-option">
+                                <input type="radio" 
+                                       name="dateOption" 
+                                       value="today" 
+                                       checked 
+                                       aria-describedby="current-date-help">
+                                <span class="radio-label">Today</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" 
+                                       name="dateOption" 
+                                       value="custom"
+                                       aria-describedby="current-date-help">
+                                <span class="radio-label">Custom Date</span>
+                            </label>
+                        </div>
+                        <input type="date" 
+                               id="current-date" 
+                               name="currentDate"
+                               class="date-input" 
+                               disabled
+                               aria-describedby="current-date-help current-date-error">
+                        <div id="current-date-help" class="input-help">
+                            Date for age calculations (defaults to today)
+                        </div>
+                        <div id="current-date-error" class="field-error" role="alert" aria-live="polite"></div>
+                    </div>
+
+                    <!-- Calculate Button -->
+                    <button type="submit" class="btn-primary calculate-btn" id="calculate-btn">
+                        Calculate Ages
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results-section" class="results-section" aria-label="Calculation Results" style="display: none;">
+            <h2 class="section-title">Results</h2>
+            
+            <!-- Corrected Age Result -->
+            <div class="age-result corrected-age">
+                <h3 class="age-type">Corrected Age</h3>
+                <div class="age-value" id="corrected-age-value" aria-live="polite">
+                    <span class="primary-age"></span>
+                    <span class="secondary-age"></span>
+                </div>
+                <div class="age-explanation">
+                    <p>The age your baby would be if born at full term (40 weeks)</p>
+                </div>
+            </div>
+
+            <!-- Postmenstrual Age Result -->
+            <div class="age-result postmenstrual-age">
+                <h3 class="age-type">Postmenstrual Age (PMA)</h3>
+                <div class="age-value" id="postmenstrual-age-value" aria-live="polite">
+                    <span class="primary-age"></span>
+                    <span class="term-indicator"></span>
+                </div>
+                <div class="age-explanation">
+                    <p>Total time since onset of last menstrual period</p>
+                </div>
+            </div>
+
+            <!-- Chronological Age Result -->
+            <div class="age-result chronological-age">
+                <h3 class="age-type">Chronological Age</h3>
+                <div class="age-value" id="chronological-age-value" aria-live="polite">
+                    <span class="primary-age"></span>
+                    <span class="secondary-age"></span>
+                </div>
+                <div class="age-explanation">
+                    <p>Actual time since birth (for reference)</p>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="additional-info">
+                <h3>Additional Information</h3>
+                <div id="additional-details" class="info-content"></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="result-actions">
+                <button type="button" class="btn-secondary" id="clear-btn">
+                    Clear & Calculate Again
+                </button>
+                <button type="button" class="btn-secondary" id="print-btn">
+                    Print Results
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+            <p class="disclaimer">
+                <strong>Medical Disclaimer:</strong> This calculator is for educational purposes only. 
+                Always consult with healthcare professionals for medical decisions.
+            </p>
+            <p class="privacy-note">
+                <span class="privacy-icon" aria-hidden="true">🔒</span>
+                No data is stored or transmitted. All calculations are performed locally.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Loading overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;" aria-hidden="true">
+        <div class="loading-spinner" role="status" aria-label="Calculating...">
+            <span class="sr-only">Calculating ages...</span>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/utils.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/calculator.js"></script>
+    <script src="js/ui.js"></script>
+    
+    <!-- Initialize application -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            UIController.init();
+        });
+    </script>
+</body>
+</html>

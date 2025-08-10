@@ -1,0 +1,525 @@
+/* Responsive Design - Mobile First Approach */
+
+/* Base styles already defined for mobile in styles.css */
+
+/* Tablet Styles - 640px and up */
+@media (min-width: 640px) {
+    /* Header adjustments */
+    .header-container {
+        padding: var(--space-5) var(--space-6);
+    }
+    
+    .app-title {
+        font-size: var(--text-3xl);
+    }
+    
+    .help-toggle {
+        width: 48px;
+        height: 48px;
+        font-size: var(--text-xl);
+    }
+    
+    /* Main container */
+    .main-container {
+        padding: var(--space-8) var(--space-6);
+    }
+    
+    /* Help panel */
+    .help-panel {
+        padding: var(--space-8);
+    }
+    
+    .help-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-6);
+    }
+    
+    .help-content h2 {
+        grid-column: 1 / -1;
+    }
+    
+    /* Calculator section */
+    .calculator-section {
+        padding: var(--space-12);
+    }
+    
+    /* Input groups - side by side layout */
+    .input-section {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+    }
+    
+    /* Gestational age inputs larger touch targets */
+    .gestational-inputs {
+        gap: var(--space-6);
+    }
+    
+    .number-input {
+        padding: var(--space-4) var(--space-5);
+        font-size: var(--text-lg);
+    }
+    
+    /* Date option group */
+    .date-option-group {
+        gap: var(--space-6);
+    }
+    
+    .radio-option input[type="radio"] {
+        width: 20px;
+        height: 20px;
+    }
+    
+    /* Button improvements */
+    .calculate-btn {
+        max-width: 400px;
+        margin: var(--space-6) auto 0;
+    }
+    
+    /* Results section */
+    .results-section {
+        padding: var(--space-12);
+    }
+    
+    /* Age results - two column layout */
+    .age-results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--space-6);
+    }
+    
+    .age-result {
+        padding: var(--space-8);
+    }
+    
+    .primary-age {
+        font-size: var(--text-3xl);
+    }
+    
+    /* Additional info */
+    .additional-info {
+        padding: var(--space-8);
+    }
+    
+    /* Result actions */
+    .result-actions {
+        gap: var(--space-6);
+    }
+    
+    .btn-secondary {
+        min-width: 160px;
+    }
+    
+    /* Footer */
+    .footer-content {
+        padding: var(--space-8) var(--space-6);
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+    }
+    
+    .disclaimer {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 300px;
+    }
+    
+    .privacy-note {
+        flex-shrink: 0;
+    }
+}
+
+/* Desktop Styles - 1024px and up */
+@media (min-width: 1024px) {
+    /* Two-column layout for desktop */
+    .main-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-12);
+        align-items: start;
+    }
+    
+    .help-panel {
+        grid-column: 1 / -1;
+    }
+    
+    .calculator-section {
+        grid-column: 1;
+        margin-bottom: 0;
+    }
+    
+    .results-section {
+        grid-column: 2;
+        margin-bottom: 0;
+        position: sticky;
+        top: calc(var(--space-16) + 60px); /* Account for header height */
+    }
+    
+    /* Enhanced input section for desktop */
+    .input-section {
+        gap: var(--space-8);
+    }
+    
+    /* Better gestational age input layout */
+    .gestational-inputs {
+        justify-content: space-between;
+        max-width: 300px;
+    }
+    
+    .gestational-weeks,
+    .gestational-days {
+        flex: 0 0 120px;
+    }
+    
+    /* Date options horizontal */
+    .date-option-group {
+        justify-content: flex-start;
+    }
+    
+    /* Calculate button desktop styling */
+    .calculate-btn {
+        max-width: none;
+        margin: var(--space-8) 0 0;
+        padding: var(--space-6) var(--space-8);
+    }
+    
+    /* Results enhancements */
+    .age-result {
+        transition: all var(--transition-fast);
+    }
+    
+    .age-result:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--box-shadow-lg);
+    }
+    
+    /* Enhanced result actions */
+    .result-actions {
+        justify-content: flex-start;
+    }
+    
+    /* Hover effects for desktop */
+    .input-group:hover .input-label {
+        color: var(--primary-blue);
+        transition: color var(--transition-fast);
+    }
+    
+    .date-input:hover,
+    .number-input:hover {
+        border-color: var(--primary-blue);
+        transition: border-color var(--transition-fast);
+    }
+    
+    /* Focus improvements for desktop */
+    .date-input:focus,
+    .number-input:focus {
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+    
+    /* Keyboard shortcut indicators (optional enhancement) */
+    .calculate-btn::after {
+        content: ' (Enter)';
+        font-size: var(--text-sm);
+        opacity: 0.7;
+        font-weight: var(--font-normal);
+    }
+}
+
+/* Large Desktop - 1280px and up */
+@media (min-width: 1280px) {
+    .main-container {
+        max-width: 1400px;
+        gap: var(--space-16);
+        grid-template-columns: 1.2fr 1fr;
+    }
+    
+    /* Enhanced calculator section */
+    .calculator-section {
+        padding: var(--space-16);
+    }
+    
+    .results-section {
+        padding: var(--space-16);
+    }
+    
+    /* Three-column help layout */
+    .help-content {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    /* Larger touch targets and spacing */
+    .input-group {
+        gap: var(--space-3);
+    }
+    
+    .date-input,
+    .number-input {
+        padding: var(--space-5) var(--space-6);
+        font-size: var(--text-lg);
+    }
+    
+    /* Enhanced age display */
+    .primary-age {
+        font-size: 2.25rem; /* ~36px */
+    }
+    
+    .age-type {
+        font-size: var(--text-xl);
+    }
+}
+
+/* Extra Large Screens - 1536px and up */
+@media (min-width: 1536px) {
+    .main-container {
+        max-width: 1600px;
+    }
+    
+    /* Ultra-wide layout adjustments */
+    .help-content {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    /* Enhanced spacing */
+    .input-section {
+        gap: var(--space-12);
+    }
+    
+    .age-result {
+        padding: var(--space-12);
+    }
+}
+
+/* Portrait Tablet Specific - 640px to 1024px in portrait */
+@media (min-width: 640px) and (max-width: 1023px) and (orientation: portrait) {
+    .main-container {
+        display: block;
+    }
+    
+    /* Enhanced single-column layout for portrait tablets */
+    .calculator-section,
+    .results-section {
+        max-width: 600px;
+        margin: 0 auto var(--space-8);
+    }
+    
+    /* Better touch targets for tablets */
+    .calculate-btn {
+        font-size: var(--text-xl);
+        padding: var(--space-6) var(--space-8);
+    }
+    
+    .help-toggle {
+        width: 52px;
+        height: 52px;
+    }
+}
+
+/* Landscape Mobile - up to 640px in landscape */
+@media (max-width: 639px) and (orientation: landscape) {
+    /* Adjust for limited vertical space */
+    .main-container {
+        padding: var(--space-4);
+    }
+    
+    .calculator-section,
+    .results-section {
+        padding: var(--space-6);
+    }
+    
+    .help-panel {
+        padding: var(--space-4);
+    }
+    
+    /* Reduce vertical spacing */
+    .input-group {
+        gap: var(--space-2);
+    }
+    
+    .input-section {
+        gap: var(--space-4);
+    }
+    
+    .age-result {
+        padding: var(--space-4);
+        margin-bottom: var(--space-3);
+    }
+    
+    /* Horizontal layout for gestational inputs */
+    .gestational-inputs {
+        flex-direction: row;
+        gap: var(--space-3);
+    }
+    
+    /* Compact result display */
+    .primary-age {
+        font-size: var(--text-xl);
+    }
+    
+    .age-type {
+        font-size: var(--text-base);
+    }
+}
+
+/* Small Mobile - up to 480px */
+@media (max-width: 480px) {
+    /* Ultra-compact layout for small screens */
+    .header-container {
+        padding: var(--space-3);
+    }
+    
+    .app-title {
+        font-size: var(--text-xl);
+    }
+    
+    .app-title .icon {
+        font-size: var(--text-2xl);
+    }
+    
+    .help-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: var(--text-base);
+    }
+    
+    .main-container {
+        padding: var(--space-3);
+    }
+    
+    .calculator-section,
+    .results-section {
+        padding: var(--space-4);
+    }
+    
+    /* Compact input styling */
+    .input-label {
+        font-size: var(--text-base);
+    }
+    
+    .date-input,
+    .number-input {
+        padding: var(--space-2) var(--space-3);
+    }
+    
+    /* Stack gestational inputs on very small screens */
+    .gestational-inputs {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    
+    .gestational-weeks,
+    .gestational-days {
+        text-align: center;
+    }
+    
+    /* Compact button */
+    .calculate-btn {
+        font-size: var(--text-lg);
+        padding: var(--space-4) var(--space-5);
+    }
+    
+    /* Stack action buttons */
+    .result-actions {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    
+    .btn-secondary {
+        width: 100%;
+    }
+    
+    /* Compact footer */
+    .footer-content {
+        padding: var(--space-4);
+        flex-direction: column;
+        text-align: center;
+        gap: var(--space-3);
+    }
+}
+
+/* High DPI / Retina Display Optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+    /* Sharper borders for high DPI displays */
+    .date-input,
+    .number-input,
+    .age-result {
+        border-width: 0.5px;
+    }
+    
+    /* Enhanced shadows for crisp appearance */
+    .calculator-section,
+    .results-section {
+        box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.12), 0 2px 8px -2px rgba(0, 0, 0, 0.08);
+    }
+}
+
+/* Container Queries Support (Progressive Enhancement) */
+@supports (container-type: inline-size) {
+    .calculator-section {
+        container-type: inline-size;
+    }
+    
+    @container (min-width: 500px) {
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-6) var(--space-8);
+            align-items: start;
+        }
+        
+        .calculate-btn {
+            grid-column: 1 / -1;
+            justify-self: center;
+            max-width: 300px;
+        }
+    }
+}
+
+/* Dark Mode Support (Future Enhancement) */
+@media (prefers-color-scheme: dark) {
+    /* Dark mode variables would go here */
+    /* This is prepared for future dark mode implementation */
+}
+
+/* Animations for better UX on larger screens */
+@media (min-width: 1024px) {
+    .age-result {
+        animation: slideInUp 0.3s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .age-result:nth-child(1) { animation-delay: 0.1s; }
+    .age-result:nth-child(2) { animation-delay: 0.2s; }
+    .age-result:nth-child(3) { animation-delay: 0.3s; }
+    
+    .additional-info {
+        animation: slideInUp 0.3s ease-out 0.4s both;
+    }
+    
+    .result-actions {
+        animation: slideInUp 0.3s ease-out 0.5s both;
+    }
+}
+
+/* Focus management for keyboard navigation */
+@media (min-width: 1024px) {
+    /* Enhanced focus indicators for desktop keyboard users */
+    .input-group:focus-within .input-label {
+        color: var(--primary-blue);
+    }
+    
+    .gestational-fieldset:focus-within legend {
+        color: var(--primary-blue);
+    }
+    
+    /* Tab navigation improvements */
+    .help-toggle:focus,
+    .btn-primary:focus,
+    .btn-secondary:focus {
+        outline: 3px solid var(--primary-blue);
+        outline-offset: 3px;
+    }
+}
