@@ -185,16 +185,26 @@ body {
     border: 1px solid var(--primary-blue);
     border-radius: var(--border-radius-lg);
     padding: var(--space-6);
-    margin-bottom: var(--space-8);
+    margin-bottom: 0;
     opacity: 0;
     max-height: 0;
     overflow: hidden;
     transition: all var(--transition-normal);
+    display: none;
 }
 
 .help-panel.show {
-    opacity: 1;
+    opacity: 0;
     max-height: 1000px;
+    display: block;
+    animation: showHelp var(--transition-normal) forwards;
+}
+
+@keyframes showHelp {
+    to {
+        opacity: 1;
+        max-height: 1000px;
+    }
 }
 
 .help-panel h2 {
