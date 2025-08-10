@@ -544,8 +544,10 @@ const UIController = {
             <span>${message}</span>
         `;
         
-        // Insert after form
-        this.elements.form.parentNode.insertBefore(warningElement, this.elements.resultsSection);
+        // Insert after form section, before results section
+        const calculatorSection = this.elements.form.parentNode;
+        const parentContainer = calculatorSection.parentNode;
+        parentContainer.insertBefore(warningElement, this.elements.resultsSection);
         
         // Remove after 5 seconds
         setTimeout(() => {
@@ -749,7 +751,10 @@ const UIController = {
             <span>${message}</span>
         `;
         
-        this.elements.form.parentNode.insertBefore(errorElement, this.elements.resultsSection);
+        // Insert error after the form section, before results section
+        const calculatorSection = this.elements.form.parentNode;
+        const parentContainer = calculatorSection.parentNode;
+        parentContainer.insertBefore(errorElement, this.elements.resultsSection);
         
         setTimeout(() => {
             if (errorElement.parentNode) {
