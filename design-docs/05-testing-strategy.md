@@ -1,29 +1,30 @@
-# Testing Strategy and Test Cases
+# Testing Strategy and Test Cases (React TypeScript)
 
 ## Testing Overview
 
-This document outlines the comprehensive testing strategy for the Corrected Age Calculator, including unit tests, integration tests, user acceptance tests, and accessibility testing.
+This document outlines the comprehensive testing strategy for the React TypeScript Corrected Age Calculator, including type-safe unit tests with Vitest, component testing with React Testing Library, end-to-end testing with Playwright, and comprehensive accessibility testing with Material UI's built-in accessibility features.
 
-## Testing Pyramid
+## React TypeScript Testing Pyramid
 
 ```
     ┌─────────────────┐
-    │   Manual Tests  │  ← Exploratory, Usability, Accessibility
-    │   (10% effort)  │
+    │ E2E Tests (5%)  │  ← Playwright with TypeScript
+    │ (Playwright)    │     Cross-browser workflows
     ├─────────────────┤
-    │ Integration     │  ← End-to-end workflows, UI components
-    │ Tests (30%)     │
+    │ Component Tests │  ← React Testing Library + Vitest
+    │ (25% effort)    │     Material UI component interactions
     ├─────────────────┤
-    │   Unit Tests    │  ← Core calculations, validation logic
-    │   (60% effort)  │
+    │ Unit Tests      │  ← Vitest with full TypeScript coverage
+    │ (70% effort)    │     Type-safe calculations, validation
     └─────────────────┘
 ```
 
 ## Unit Testing
 
-### Test Framework
-- **Framework**: Jest for JavaScript testing
-- **Coverage Target**: 95% code coverage
+### Test Framework (Vitest + TypeScript)
+- **Framework**: Vitest for TypeScript testing with native ESM support
+- **Coverage Target**: 95% code coverage with TypeScript strict mode
+- **Type Safety**: Full TypeScript coverage for test files and assertions
 - **Test Environment**: Node.js with jsdom for DOM simulation
 
 ### Calculator Module Tests (`calculator.test.js`)

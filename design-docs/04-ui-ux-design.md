@@ -1,16 +1,16 @@
-# UI/UX Design Specification
+# UI/UX Design Specification (Material UI)
 
 ## Design Philosophy
 
-The application follows principles of medical device design: **clarity, accuracy, and efficiency**. The interface prioritizes usability for healthcare professionals working in fast-paced environments while remaining accessible to parents and caregivers.
+The application follows Material Design principles combined with medical device design standards: **clarity, consistency, and efficiency**. The interface leverages Material UI components to provide a familiar, accessible experience for healthcare professionals and parents while maintaining medical accuracy and professional appearance.
 
 ### Design Principles
-1. **Clarity First**: All information is clearly labeled and easy to understand
-2. **Error Prevention**: Design prevents common input mistakes
-3. **Immediate Feedback**: Real-time validation and calculation updates
-4. **Accessibility**: Usable by all users regardless of abilities
-5. **Mobile-First**: Optimized for use on phones and tablets
-6. **Minimal Cognitive Load**: Reduce mental effort required to use the app
+1. **Material Design Clarity**: Consistent visual hierarchy using Material UI Typography and spacing
+2. **Error Prevention**: Material UI form validation with clear error states and helpful messaging
+3. **Immediate Feedback**: Real-time validation with Material UI Snackbar notifications and input states
+4. **Accessibility**: WCAG 2.1 AA compliance through Material UI's built-in accessibility features
+5. **Responsive Design**: Material UI Grid system for optimal mobile and desktop experiences
+6. **Progressive Disclosure**: Material UI Accordion and Dialog components for layered information
 
 ## User Personas
 
@@ -28,28 +28,63 @@ The application follows principles of medical device design: **clarity, accuracy
 - **Pain Points**: Medical terminology confusion, anxiety about calculations
 - **Needs**: Clear explanations, educational content, reassurance
 
-## Information Architecture
+## Material UI Information Architecture
 
-### Content Hierarchy
-```
-Application Title
-├── Input Section
-│   ├── Date of Birth
-│   ├── Gestational Age at Birth
-│   └── Current Date (optional)
-├── Calculation Button
-├── Results Section
-│   ├── Corrected Age
-│   ├── Postmenstrual Age
-│   ├── Chronological Age (reference)
-│   └── Additional Information
-├── Help & Information
-│   ├── Calculation Explanations
-│   ├── Medical Background
-│   └── Usage Examples
-└── Footer
-    ├── About/Credits
-    └── Privacy Information
+### Component Hierarchy with Material UI
+```typescript
+// React component structure with Material UI
+<ThemeProvider theme={customTheme}>
+  <CssBaseline />
+  <Container maxWidth="lg">
+    <AppBar position="static">
+      <Toolbar>
+        <Typography variant="h5">Corrected Age Calculator</Typography>
+        <IconButton onClick={handleHelpToggle}>
+          <HelpIcon />
+        </IconButton>
+      </Toolbar>
+    </AppBar>
+    
+    <Grid container spacing={3}>
+      <Grid item xs={12} md={6}>
+        <Paper elevation={2}>
+          <Box p={3}>
+            <Typography variant="h6">Input Information</Typography>
+            <DatePicker label="Date of Birth" />
+            <TextField label="Gestational Weeks" type="number" />
+            <TextField label="Gestational Days" type="number" />
+            <Button variant="contained" size="large">
+              Calculate Ages
+            </Button>
+          </Box>
+        </Paper>
+      </Grid>
+      
+      <Grid item xs={12} md={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="h6">Results</Typography>
+            <ResultsDisplay results={calculationResults} />
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+    
+    <Dialog open={helpOpen}>
+      <DialogTitle>Help & Information</DialogTitle>
+      <DialogContent>
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography>Calculation Explanations</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            {/* Educational content */}
+          </AccordionDetails>
+        </Accordion>
+      </DialogContent>
+    </Dialog>
+  </Container>
+</ThemeProvider>
 ```
 
 ## User Flow Diagrams
@@ -69,114 +104,265 @@ Start → Read Help → Enter Data → Get Validation Error → Correct Input �
 Input Error → See Error Message → Read Help Text → Correct Input → Try Again → Success
 ```
 
-## Wireframes
+## Material UI Component Layouts
 
-### Mobile Layout (Primary)
-```
-┌─────────────────────┐
-│ Corrected Age Calc  │  ← Header with title
-├─────────────────────┤
-│ 📅 Date of Birth    │  ← Input section
-│ [MM/DD/YYYY]        │    with icons
-│                     │
-│ 🤱 Gestational Age  │
-│ [##] weeks [#] days │
-│                     │
-│ 📅 Current Date     │
-│ [Today] [Custom]    │
-│                     │
-│ [CALCULATE AGES]    │  ← Large CTA button
-├─────────────────────┤
-│ Results             │  ← Results section
-│ Corrected Age       │    (hidden until calc)
-│ ## weeks ## days    │
-│                     │
-│ Postmenstrual Age   │
-│ ## weeks ## days    │
-│                     │
-│ [More Info] [Help]  │  ← Action buttons
-└─────────────────────┘
-```
-
-### Desktop Layout
-```
-┌─────────────────────────────────────────────────────────┐
-│ 🍼 Corrected Age Calculator                    [?] Help │  ← Header
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│ Input Information          │  Results                   │  ← Two-column
-│ ┌─────────────────────────┐ │ ┌───────────────────────┐  │    layout
-│ │ Date of Birth           │ │ │ Corrected Age         │  │
-│ │ [MM/DD/YYYY]            │ │ │ [Calculated result]   │  │
-│ │                         │ │ │                       │  │
-│ │ Gestational Age         │ │ │ Postmenstrual Age     │  │
-│ │ [##] weeks [#] days     │ │ │ [Calculated result]   │  │
-│ │                         │ │ │                       │  │
-│ │ Current Date            │ │ │ Additional Info       │  │
-│ │ ○ Today ○ Custom Date   │ │ │ [Explanations]        │  │
-│ │                         │ │ │                       │  │
-│ │ [CALCULATE]             │ │ │ [Share] [Print]       │  │
-│ └─────────────────────────┘ │ └───────────────────────┘  │
-└─────────────────────────────────────────────────────────┘
-```
-
-## Visual Design System
-
-### Color Palette
-```css
-/* Primary Colors */
---primary-blue: #2563eb      /* Medical blue, trust and reliability */
---primary-light: #dbeafe    /* Light blue for backgrounds */
---primary-dark: #1d4ed8     /* Dark blue for text */
-
-/* Semantic Colors */
---success-green: #059669    /* Successful calculations */
---warning-orange: #d97706   /* Warnings and alerts */
---error-red: #dc2626       /* Errors and validation issues */
---info-gray: #6b7280       /* Secondary information */
-
-/* Neutral Colors */
---white: #ffffff           /* Backgrounds */
---gray-50: #f9fafb        /* Light backgrounds */
---gray-100: #f3f4f6       /* Borders and dividers */
---gray-800: #1f2937       /* Primary text */
---gray-600: #4b5563       /* Secondary text */
+### Mobile Layout (Material UI Grid)
+```typescript
+// Mobile-first responsive layout using Material UI
+<Container maxWidth="sm">
+  <AppBar position="static" color="primary">
+    <Toolbar>
+      <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        🍼 Corrected Age Calculator
+      </Typography>
+      <IconButton color="inherit" onClick={handleHelpOpen}>
+        <HelpIcon />
+      </IconButton>
+    </Toolbar>
+  </AppBar>
+  
+  <Box sx={{ mt: 2 }}>
+    <Paper elevation={1} sx={{ p: 3, mb: 2 }}>
+      <Typography variant="h6" gutterBottom>
+        Input Information
+      </Typography>
+      
+      <Stack spacing={3}>
+        <DatePicker
+          label="Date of Birth"
+          value={birthDate}
+          onChange={setBirthDate}
+          renderInput={(params) => <TextField {...params} fullWidth />}
+        />
+        
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <TextField
+            label="Weeks"
+            type="number"
+            inputProps={{ min: 20, max: 44 }}
+            sx={{ flex: 1 }}
+          />
+          <TextField
+            label="Days"
+            type="number"
+            inputProps={{ min: 0, max: 6 }}
+            sx={{ flex: 1 }}
+          />
+        </Box>
+        
+        <Button
+          variant="contained"
+          size="large"
+          fullWidth
+          startIcon={<CalculateIcon />}
+          onClick={handleCalculate}
+        >
+          Calculate Ages
+        </Button>
+      </Stack>
+    </Paper>
+    
+    <Collapse in={hasResults}>
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Results
+          </Typography>
+          <ResultCards results={results} />
+        </CardContent>
+      </Card>
+    </Collapse>
+  </Box>
+</Container>
 ```
 
-### Typography
-```css
-/* Font Stack */
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
-             'Helvetica Neue', Arial, sans-serif;
-
-/* Type Scale */
---text-xs: 0.75rem     /* 12px - Small labels */
---text-sm: 0.875rem    /* 14px - Body text */
---text-base: 1rem      /* 16px - Default */
---text-lg: 1.125rem    /* 18px - Input labels */
---text-xl: 1.25rem     /* 20px - Section headers */
---text-2xl: 1.5rem     /* 24px - Results */
---text-3xl: 1.875rem   /* 30px - Page title */
-
-/* Font Weights */
---font-normal: 400
---font-medium: 500
---font-semibold: 600
---font-bold: 700
+### Desktop Layout (Material UI Responsive Grid)
+```typescript
+// Desktop layout with side-by-side panels
+<Container maxWidth="lg">
+  <Grid container spacing={3}>
+    {/* Input Panel */}
+    <Grid item xs={12} md={6}>
+      <Paper elevation={2} sx={{ p: 3, height: 'fit-content' }}>
+        <Typography variant="h5" gutterBottom>
+          Input Information
+        </Typography>
+        <InputForm onSubmit={handleCalculate} />
+      </Paper>
+    </Grid>
+    
+    {/* Results Panel */}
+    <Grid item xs={12} md={6}>
+      <Fade in={hasResults}>
+        <Paper elevation={2} sx={{ p: 3 }}>
+          <Typography variant="h5" gutterBottom>
+            Calculation Results
+          </Typography>
+          
+          <Stack spacing={2}>
+            <ResultCard
+              title="Corrected Age"
+              value={results.corrected}
+              color="primary"
+              icon={<BabyIcon />}
+            />
+            <ResultCard
+              title="Postmenstrual Age"
+              value={results.postmenstrual}
+              color="secondary"
+              icon={<TimeIcon />}
+            />
+            <ResultCard
+              title="Chronological Age"
+              value={results.chronological}
+              color="grey"
+              icon={<CalendarIcon />}
+            />
+          </Stack>
+          
+          <Box sx={{ mt: 3, display: 'flex', gap: 1 }}>
+            <Button startIcon={<PrintIcon />} onClick={handlePrint}>
+              Print
+            </Button>
+            <Button startIcon={<ShareIcon />} onClick={handleShare}>
+              Share
+            </Button>
+          </Box>
+        </Paper>
+      </Fade>
+    </Grid>
+  </Grid>
+</Container>
 ```
 
-### Spacing System
-```css
-/* Spacing Scale (based on 8px grid) */
---space-1: 0.25rem    /* 4px */
---space-2: 0.5rem     /* 8px */
---space-3: 0.75rem    /* 12px */
---space-4: 1rem       /* 16px */
---space-5: 1.25rem    /* 20px */
---space-6: 1.5rem     /* 24px */
---space-8: 2rem       /* 32px */
---space-12: 3rem      /* 48px */
---space-16: 4rem      /* 64px */
+## Material UI Design System
+
+### Custom Theme Configuration
+```typescript
+import { createTheme } from '@mui/material/styles';
+
+export const medicalTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#2563eb',        // Medical blue - trust and reliability
+      light: '#dbeafe',       // Light blue for backgrounds
+      dark: '#1d4ed8',        // Dark blue for emphasis
+      contrastText: '#ffffff'
+    },
+    secondary: {
+      main: '#059669',        // Success green - positive results
+      light: '#d1fae5',       // Light green backgrounds
+      dark: '#047857',        // Dark green for emphasis
+      contrastText: '#ffffff'
+    },
+    error: {
+      main: '#dc2626',        // Error red - validation issues
+      light: '#fecaca',       // Light red for backgrounds
+      dark: '#991b1b'         // Dark red for emphasis
+    },
+    warning: {
+      main: '#d97706',        // Warning orange - alerts
+      light: '#fed7aa',       // Light orange backgrounds
+      dark: '#92400e'         // Dark orange for emphasis
+    },
+    info: {
+      main: '#6b7280',        // Info gray - secondary information
+      light: '#f3f4f6',       // Light gray backgrounds
+      dark: '#374151'         // Dark gray for text
+    }
+  },
+  
+  typography: {
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    h1: { fontSize: '2.5rem', fontWeight: 600, lineHeight: 1.2 },
+    h2: { fontSize: '2rem', fontWeight: 500, lineHeight: 1.3 },
+    h3: { fontSize: '1.75rem', fontWeight: 500, lineHeight: 1.4 },
+    h4: { fontSize: '1.5rem', fontWeight: 500, lineHeight: 1.4 },
+    h5: { fontSize: '1.25rem', fontWeight: 500, lineHeight: 1.5 },
+    h6: { fontSize: '1.125rem', fontWeight: 500, lineHeight: 1.5 },
+    body1: { fontSize: '1rem', lineHeight: 1.6 },
+    body2: { fontSize: '0.875rem', lineHeight: 1.6 },
+    caption: { fontSize: '0.75rem', lineHeight: 1.4 }
+  },
+  
+  spacing: 8, // 8px base unit for consistent spacing
+  
+  shape: {
+    borderRadius: 8 // Consistent border radius
+  },
+  
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none', // Remove default uppercase
+          fontWeight: 500,
+          borderRadius: 8
+        },
+        sizeLarge: {
+          padding: '12px 24px',
+          fontSize: '1.125rem'
+        }
+      }
+    },
+    
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 8,
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: '#2563eb'
+            }
+          }
+        }
+      }
+    },
+    
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+        }
+      }
+    },
+    
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8
+        }
+      }
+    }
+  }
+});
+```
+
+### Responsive Breakpoints
+```typescript
+// Material UI responsive breakpoints
+const theme = createTheme({
+  breakpoints: {
+    values: {
+      xs: 0,      // Mobile
+      sm: 640,    // Small tablet
+      md: 1024,   // Desktop
+      lg: 1280,   // Large desktop
+      xl: 1920    // Extra large
+    }
+  }
+});
+
+// Usage in components
+const useStyles = makeStyles((theme) => ({
+  container: {
+    padding: theme.spacing(2),
+    [theme.breakpoints.up('md')]: {
+      padding: theme.spacing(4)
+    }
+  }
+}));
 ```
 
 ## Component Specifications

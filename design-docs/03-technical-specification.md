@@ -1,145 +1,290 @@
-# Technical Specification
+# Technical Specification (React TypeScript)
 
 ## Architecture Overview
 
-This application will be built as a simple, single-page HTML application with vanilla JavaScript, CSS, and HTML. The architecture prioritizes simplicity, performance, and offline functionality.
+This application is built as a modern React TypeScript single-page application with Material UI components. The architecture prioritizes type safety, component reusability, performance optimization, and maintainability.
 
 ### Technology Stack
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript (ES6+)
-- **Build Process**: None required (direct HTML/CSS/JS files)
-- **Testing**: Jest for unit tests, manual testing for UI
-- **Version Control**: Git
-- **Deployment**: Static file hosting (GitHub Pages, Netlify, etc.)
+- **Frontend**: React 18, TypeScript 5, Material UI 5
+- **Build Process**: Vite with TypeScript compilation and optimization
+- **State Management**: React Context API with custom hooks
+- **Date Handling**: Day.js with Material UI Date Pickers
+- **Testing**: Vitest, React Testing Library, Jest DOM, Playwright
+- **Linting**: ESLint with TypeScript rules, Prettier
+- **Version Control**: Git with conventional commits
+- **Deployment**: Vercel/Netlify with preview environments
 
-### File Structure
+### React TypeScript File Structure
 ```
 corrected-age-calculator/
-├── index.html              # Main application page
-├── css/
-│   ├── styles.css          # Main stylesheet
-│   └── responsive.css      # Mobile responsiveness
-├── js/
-│   ├── calculator.js       # Core calculation logic
-│   ├── ui.js              # UI interaction handling
-│   ├── validation.js      # Input validation
-│   └── utils.js           # Utility functions
-├── assets/
-│   ├── icons/             # Application icons
-│   └── images/            # Any required images
-├── tests/
-│   ├── calculator.test.js # Unit tests for calculations
-│   ├── validation.test.js # Validation tests
-│   └── test-runner.html   # Browser-based test runner
-└── docs/
-    └── README.md          # User documentation
+├── index.html                    # Vite entry point
+├── package.json                  # Dependencies and scripts
+├── vite.config.ts               # Vite build configuration
+├── tsconfig.json                # TypeScript compiler config
+├── src/
+│   ├── main.tsx                 # React app entry point
+│   ├── App.tsx                  # Root component with providers
+│   ├── components/              # React components
+│   │   ├── Calculator/
+│   │   │   ├── CalculatorForm.tsx    # Main form with Material UI
+│   │   │   ├── DateInput.tsx         # MUI DatePicker wrapper
+│   │   │   └── GestationalAgeInput.tsx # Custom number inputs
+│   │   ├── Results/
+│   │   │   ├── ResultsDisplay.tsx    # Results container
+│   │   │   ├── AgeResult.tsx         # Individual age display
+│   │   │   └── AdditionalInfo.tsx    # Insights and recommendations
+│   │   ├── Layout/
+│   │   │   ├── Header.tsx            # App header with help
+│   │   │   ├── Footer.tsx            # App footer
+│   │   │   └── HelpPanel.tsx         # Educational content
+│   │   └── Common/
+│   │       ├── LoadingSpinner.tsx    # Loading states
+│   │       └── ErrorBoundary.tsx     # Error handling
+│   ├── hooks/                   # Custom React hooks
+│   │   ├── useCalculator.ts         # Calculator state management
+│   │   ├── useValidation.ts         # Form validation logic
+│   │   └── useLocalStorage.ts       # Persistence utility
+│   ├── lib/                     # Core business logic
+│   │   ├── calculator.ts            # Type-safe calculations
+│   │   ├── validation.ts            # Input validation
+│   │   └── utils.ts                # Utility functions
+│   ├── types/                   # TypeScript definitions
+│   │   ├── calculator.ts            # Calculation types
+│   │   └── validation.ts            # Validation types
+│   ├── theme/                   # Material UI theme
+│   │   ├── theme.ts                # Custom theme config
+│   │   └── components.ts           # Component overrides
+│   └── __tests__/              # Test files
+│       ├── components/             # Component tests
+│       ├── lib/                   # Logic tests  
+│       └── hooks/                 # Hook tests
+├── public/
+│   └── assets/                 # Static assets
+└── docs/                       # Documentation
 ```
 
-## Core Components
+## Core React TypeScript Components
 
-### 1. Calculator Module (`js/calculator.js`)
-Handles all age calculations with pure functions.
+### 1. Calculator Logic (`src/lib/calculator.ts`)
+Type-safe calculation engine with comprehensive error handling.
 
 **Key Functions**:
-```javascript
-// Core calculation functions
-calculateChronologicalAge(birthDate, currentDate)
-calculateCorrectedAge(birthDate, gestationalAge, currentDate)
-calculatePostmenstrualAge(birthDate, gestationalAge, currentDate)
+```typescript
+// Type-safe core calculation functions
+export const calculateChronologicalAge = (
+  birthDate: Date, 
+  currentDate: Date
+): ChronologicalAgeResult => { /* ... */ }
 
-// Utility functions
-parseGestationalAge(gestationalString)
-formatAge(ageInDays, format)
-isValidGestationalAge(weeks, days)
+export const calculateCorrectedAge = (
+  birthDate: Date,
+  gestationalAge: GestationalAge,
+  currentDate: Date
+): CorrectedAgeResult => { /* ... */ }
+
+export const calculatePostmenstrualAge = (
+  birthDate: Date,
+  gestationalAge: GestationalAge,
+  currentDate: Date
+): PostmenstrualAgeResult => { /* ... */ }
+
+// Utility functions with strict typing
+export const parseGestationalAge = (weeks: number, days: number): GestationalAge
+export const formatAgeResult = (totalDays: number): AgeResult
+export const validateCalculationInputs = (inputs: CalculatorInputs): boolean
 ```
 
-**Data Structures**:
-```javascript
-// Age representation
-const Age = {
-    totalDays: number,
-    weeks: number,
-    days: number,
-    months: number,
-    years: number
+**TypeScript Interfaces**:
+```typescript
+// Comprehensive age representation
+interface AgeResult {
+  totalDays: number;
+  weeks: number;
+  days: number;
+  months: number;
+  years: number;
+  primaryDisplay: string;
+  secondaryDisplay: string;
 }
 
-// Gestational age representation
-const GestationalAge = {
-    weeks: number,        // 20-44
-    days: number,         // 0-6
-    totalDays: number     // calculated
+// Strict gestational age typing
+interface GestationalAge {
+  weeks: number;        // 20-44 inclusive
+  days: number;         // 0-6 inclusive
+  totalDays: number;    // calculated: weeks * 7 + days
 }
 ```
 
-### 2. UI Controller (`js/ui.js`)
-Manages user interface interactions and updates.
+### 2. React Components (`src/components/`)
+Material UI-based components with TypeScript props and state management.
 
-**Key Functions**:
-```javascript
-// Event handlers
-handleFormSubmit(event)
-handleInputChange(event)
-handleDateSelection(event)
+**Calculator Form Component**:
+```typescript
+interface CalculatorFormProps {
+  onSubmit: (data: CalculatorInputs) => void;
+  isLoading: boolean;
+  validationErrors: Record<string, string>;
+}
 
-// UI updates
-updateResults(calculations)
-displayErrors(validationErrors)
-clearResults()
-updateHelp(calculationType)
+const CalculatorForm: React.FC<CalculatorFormProps> = ({ 
+  onSubmit, 
+  isLoading, 
+  validationErrors 
+}) => {
+  // Material UI form implementation with type-safe state
+};
 ```
 
-### 3. Validation Module (`js/validation.js`)
-Validates all user inputs and provides error messages.
+**Results Display Component**:
+```typescript
+interface ResultsDisplayProps {
+  results: CalculationResults;
+  onClear: () => void;
+  onPrint: () => void;
+}
 
-**Key Functions**:
-```javascript
-// Input validation
-validateBirthDate(dateString)
-validateGestationalAge(weeks, days)
-validateCurrentDate(dateString, birthDate)
-
-// Error handling
-formatValidationError(field, errorType)
-isValidDateRange(date1, date2)
+const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ 
+  results, 
+  onClear, 
+  onPrint 
+}) => {
+  // Material UI Cards and Typography for results
+};
 ```
 
-### 4. Utilities (`js/utils.js`)
-Common utility functions used across modules.
+### 3. Custom Hooks (`src/hooks/`)
+Type-safe React hooks for state management and side effects.
 
-**Key Functions**:
-```javascript
-// Date utilities
-parseDate(dateString)
-formatDate(date, locale)
-daysBetween(date1, date2)
+**Calculator Hook**:
+```typescript
+interface UseCalculatorReturn {
+  state: CalculatorState;
+  actions: {
+    calculate: (inputs: CalculatorInputs) => Promise<void>;
+    clear: () => void;
+    updateInput: (field: keyof CalculatorInputs, value: any) => void;
+  };
+}
 
-// Number utilities
-roundToNearest(value, precision)
-clampToRange(value, min, max)
-
-// String utilities
-sanitizeInput(input)
-formatNumber(number, locale)
+export const useCalculator = (): UseCalculatorReturn => {
+  // React state management with TypeScript
+};
 ```
 
-## Data Flow
+**Validation Hook**:
+```typescript
+interface UseValidationReturn {
+  errors: Record<string, string>;
+  validateField: (field: string, value: any) => boolean;
+  validateAll: (inputs: CalculatorInputs) => boolean;
+  clearErrors: () => void;
+}
 
-### Input Processing Flow
-1. User enters data in form fields
-2. Input validation occurs on blur/change events
-3. Real-time feedback provided for invalid inputs
-4. Form submission triggers comprehensive validation
-5. If valid, calculations are performed
-6. Results are displayed with appropriate formatting
-
-### Calculation Flow
-```
-User Input → Validation → Parsing → Calculation → Formatting → Display
+export const useValidation = (): UseValidationReturn => {
+  // Form validation with Material UI integration
+};
 ```
 
-### Error Handling Flow
+### 4. Material UI Theme (`src/theme/`)
+Custom theme configuration for medical application styling.
+
+**Theme Configuration**:
+```typescript
+import { createTheme, ThemeOptions } from '@mui/material/styles';
+
+const themeOptions: ThemeOptions = {
+  palette: {
+    primary: {
+      main: '#2563eb',      // Medical blue
+      light: '#dbeafe',
+      dark: '#1d4ed8'
+    },
+    secondary: {
+      main: '#059669',      // Success green
+      light: '#d1fae5',
+      dark: '#047857'
+    }
+  },
+  typography: {
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    h1: { fontSize: '2.5rem', fontWeight: 600 },
+    h2: { fontSize: '2rem', fontWeight: 500 }
+  },
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 8
+          }
+        }
+      }
+    }
+  }
+};
+
+export const theme = createTheme(themeOptions);
 ```
-Input Error → Validation → Error Message → User Feedback → Correction → Retry
+
+## React Data Flow
+
+### Component Data Flow
+```typescript
+// React Context for global state
+interface CalculatorContextType {
+  state: CalculatorState;
+  dispatch: React.Dispatch<CalculatorAction>;
+}
+
+const CalculatorContext = React.createContext<CalculatorContextType | undefined>(undefined);
+
+// Custom hook for accessing calculator state
+export const useCalculatorContext = (): CalculatorContextType => {
+  const context = useContext(CalculatorContext);
+  if (!context) {
+    throw new Error('useCalculatorContext must be used within CalculatorProvider');
+  }
+  return context;
+};
+```
+
+### Type-Safe State Management Flow
+```
+User Input (Material UI) → 
+useValidation Hook → 
+Form State Update → 
+React Context Dispatch → 
+Calculator Logic → 
+Results State Update → 
+Material UI Display Components
+```
+
+### Error Handling with React Error Boundaries
+```typescript
+class CalculatorErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Calculator Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <CalculatorErrorFallback error={this.state.error} />;
+    }
+    return this.props.children;
+  }
+}
 ```
 
 ## API Design

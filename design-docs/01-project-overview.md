@@ -1,8 +1,8 @@
-# Corrected Age Calculator - Project Overview
+# Corrected Age Calculator - Project Overview (React TypeScript)
 
 ## Purpose
 
-This application is designed to help healthcare professionals and parents calculate the corrected age and postmenstrual age of infants, particularly preterm babies. These calculations are crucial for assessing developmental milestones and medical care for infants born before full term.
+This modern React TypeScript application is designed to help healthcare professionals and parents calculate the corrected age and postmenstrual age of infants, particularly preterm babies. Built with Material UI components and comprehensive type safety, these calculations are crucial for assessing developmental milestones and medical care for infants born before full term.
 
 ## Target Users
 
@@ -17,16 +17,30 @@ This application is designed to help healthcare professionals and parents calcul
 1. **Corrected Age (Adjusted Age)**: The age an infant would be if they had been born at full term (40 weeks gestation)
 2. **Postmenstrual Age (PMA)**: The gestational age at birth plus the chronological age since birth
 
-### Required Inputs
-- Date of birth
-- Gestational age at birth (in weeks and days)
-- Current date (or date for calculation)
+### Required Inputs (TypeScript Interfaces)
+```typescript
+interface CalculatorInputs {
+  birthDate: string;           // ISO date string, validated with Material UI DatePicker
+  gestationalWeeks: number;    // 20-44, validated with Material UI TextField
+  gestationalDays: number;     // 0-6, validated with Material UI TextField
+  currentDate: string;         // ISO date string, defaults to today
+}
+```
 
-### Output Display
-- Corrected age in weeks, days, months, and years
-- Postmenstrual age in weeks and days
-- Chronological age for reference
-- Clear explanations of each calculation
+### Output Display (Type-Safe Results)
+```typescript
+interface CalculationResults {
+  corrected: CorrectedAgeResult;        // Type-safe age calculation
+  postmenstrual: PostmenstrualAgeResult; // Type-safe PMA calculation
+  chronological: ChronologicalAgeResult; // Type-safe reference age
+  insights: CalculationInsights;         // Medical context and recommendations
+}
+```
+
+- Corrected age displayed with Material UI Typography components
+- Postmenstrual age with term equivalent indicators using Material UI Chips
+- Chronological age for reference with clear visual hierarchy
+- Comprehensive explanations using Material UI Accordion components
 
 ## Medical Background
 
@@ -42,25 +56,25 @@ Postmenstrual age represents the total time since the onset of the last menstrua
 
 ## Success Criteria
 
-1. **Accuracy**: All calculations must be medically accurate and validated
-2. **Usability**: Simple, intuitive interface requiring minimal training
-3. **Accessibility**: Compliant with WCAG 2.1 guidelines
-4. **Performance**: Fast loading and calculation times
-5. **Cross-platform**: Works on desktop and mobile browsers
-6. **Offline capability**: Can function without internet connection
+1. **Type Safety**: All calculations implemented with TypeScript strict mode for medical accuracy
+2. **Material UI Consistency**: Intuitive interface using Material Design principles
+3. **Accessibility**: WCAG 2.1 AA compliance with Material UI accessibility features
+4. **Performance**: React optimization with Lighthouse score > 95
+5. **Modern Cross-platform**: Progressive Web App with responsive Material UI components
+6. **Offline capability**: Service worker implementation with React offline patterns
 
 ## Constraints and Considerations
 
-- Must handle edge cases (very preterm infants, dates in different formats)
-- Should provide warnings for unusual inputs
-- Must be culturally sensitive to different date formats
-- Should include educational information about the calculations
-- Privacy-focused: no data storage or transmission
+- TypeScript strict mode must handle all edge cases with comprehensive type safety
+- Material UI Snackbar components for user-friendly warnings
+- Internationalization support with React i18n for cultural sensitivity
+- Educational content implemented as Material UI Dialog components
+- Privacy-focused: React state management without external data transmission
 
 ## Non-Functional Requirements
 
-- Load time: < 2 seconds
-- Browser support: Modern browsers (Chrome, Firefox, Safari, Edge)
-- Mobile responsive design
-- No external dependencies for core functionality
-- Offline-first architecture
+- **Performance**: Vite build optimization, bundle size < 500KB
+- **Browser Support**: Modern ES2020+ browsers with React 18 features
+- **Responsive Design**: Material UI responsive grid system and breakpoints
+- **Dependencies**: Managed through npm with TypeScript compatibility
+- **Offline Architecture**: React service worker with Workbox integration

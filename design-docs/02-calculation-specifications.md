@@ -1,103 +1,258 @@
-# Calculation Specifications
+# Calculation Specifications (TypeScript Implementation)
 
 ## Overview
 
-This document provides detailed specifications for calculating corrected age and postmenstrual age for infants, including mathematical formulas, edge cases, and validation rules.
+This document provides detailed TypeScript specifications for calculating corrected age and postmenstrual age for infants, including type-safe mathematical formulas, comprehensive edge case handling, and validation rules with full type coverage.
 
-## Input Requirements
+## TypeScript Input Requirements
 
-### Date of Birth
-- **Format**: ISO 8601 format (YYYY-MM-DD) or locale-appropriate format
-- **Validation**: Must be a valid date, cannot be in the future
-- **Range**: Reasonable range (not more than 5 years ago for typical use cases)
+### Date of Birth (Type-Safe Validation)
+```typescript
+interface DateValidation {
+  isValid: boolean;
+  error?: string;
+  warning?: string;
+  value: Date | null;
+}
 
-### Gestational Age at Birth
-- **Format**: Weeks + Days (e.g., "32 weeks 4 days" or "32+4")
-- **Range**: 20-44 weeks (medical viability range)
-- **Validation**: 
-  - Weeks must be integer between 20-44
-  - Days must be integer between 0-6
-  - Total must not exceed 44 weeks + 0 days
-
-### Current Date (or Calculation Date)
-- **Format**: ISO 8601 format (YYYY-MM-DD)
-- **Validation**: Cannot be before date of birth
-- **Default**: Today's date if not specified
-
-## Core Calculations
-
-### 1. Chronological Age
-The actual time elapsed since birth.
-
-```
-Chronological Age = Current Date - Date of Birth
+const validateBirthDate = (dateString: string): DateValidation => {
+  // TypeScript implementation with dayjs for robust date parsing
+  const date = dayjs(dateString);
+  if (!date.isValid()) {
+    return { isValid: false, error: 'Invalid date format', value: null };
+  }
+  // Additional validation logic...
+};
 ```
 
-**Output Formats**:
-- Days (total)
-- Weeks and days
-- Months and days
-- Years, months, and days
+### Gestational Age at Birth (Strict Type Checking)
+```typescript
+interface GestationalAge {
+  weeks: number;        // 20-44 inclusive
+  days: number;         // 0-6 inclusive  
+  totalDays: number;    // calculated: weeks * 7 + days
+}
 
-### 2. Corrected Age (Adjusted Age)
-The age the infant would be if born at full term (40 weeks).
-
-```
-Corrected Age = Chronological Age - Prematurity Offset
-
-Where:
-Prematurity Offset = 40 weeks - Gestational Age at Birth
-```
-
-**Detailed Formula**:
-```
-1. Convert gestational age to total days: GA_days = (GA_weeks × 7) + GA_days
-2. Calculate full term in days: Full_term = 40 × 7 = 280 days
-3. Calculate prematurity offset: Offset = Full_term - GA_days
-4. Calculate chronological age in days: Chrono_days = Current_Date - Birth_Date
-5. Calculate corrected age: Corrected_days = Chrono_days - Offset
-```
-
-**Important Notes**:
-- Corrected age can be negative for very preterm infants
-- Corrected age is typically used until 2-3 years of age
-- For infants born at or after 37 weeks, corrected age ≈ chronological age
-
-### 3. Postmenstrual Age (PMA)
-The total time since the onset of the last menstrual period.
-
-```
-Postmenstrual Age = Gestational Age at Birth + Chronological Age
+const validateGestationalAge = (weeks: number, days: number): ValidationResult<GestationalAge> => {
+  if (!Number.isInteger(weeks) || weeks < 20 || weeks > 44) {
+    return { isValid: false, error: 'Weeks must be 20-44', value: null };
+  }
+  if (!Number.isInteger(days) || days < 0 || days > 6) {
+    return { isValid: false, error: 'Days must be 0-6', value: null };
+  }
+  
+  const totalDays = weeks * 7 + days;
+  return { 
+    isValid: true, 
+    value: { weeks, days, totalDays },
+    error: '',
+    warning: '' 
+  };
+};
 ```
 
-**Detailed Formula**:
+### Current Date (Material UI DatePicker Integration)
+```typescript
+interface CalculationDate {
+  date: Date;
+  isToday: boolean;
+  isProjected: boolean;  // future date for projected calculations
+}
+
+const validateCurrentDate = (
+  dateString: string, 
+  birthDate: Date
+): ValidationResult<CalculationDate> => {
+  // Type-safe validation with comprehensive error handling
+};
 ```
-1. Convert gestational age to days: GA_days = (GA_weeks × 7) + GA_days
-2. Calculate chronological age in days: Chrono_days = Current_Date - Birth_Date
-3. Calculate PMA in days: PMA_days = GA_days + Chrono_days
-4. Convert back to weeks and days: PMA_weeks = floor(PMA_days / 7), PMA_remainder_days = PMA_days % 7
+
+## TypeScript Core Calculations
+
+### 1. Chronological Age (Type-Safe Implementation)
+```typescript
+interface ChronologicalAgeResult extends AgeResult {
+  type: 'chronological';
+  description: string;
+}
+
+const calculateChronologicalAge = (
+  birthDate: Date, 
+  currentDate: Date
+): ChronologicalAgeResult => {
+  const totalDays = dayjs(currentDate).diff(dayjs(birthDate), 'days');
+  const ageFormatted = formatAgeResult(totalDays);
+  
+  return {
+    ...ageFormatted,
+    type: 'chronological',
+    description: 'Actual time elapsed since birth'
+  };
+};
 ```
 
-## Edge Cases and Special Scenarios
+**Type-Safe Output Formats**:
+```typescript
+interface AgeResult {
+  totalDays: number;
+  weeks: number;
+  days: number;
+  months: number;
+  years: number;
+  primaryDisplay: string;    // "6 weeks 4 days"
+  secondaryDisplay: string;  // "(1 month 1 week)"
+}
+```
 
-### 1. Negative Corrected Age
-- **Scenario**: Very preterm infant whose corrected age is negative
-- **Handling**: Display as negative value with clear explanation
-- **Example**: 24-week infant at 2 weeks old has corrected age of -14 weeks
+### 2. Corrected Age (Type-Safe Implementation)
+```typescript
+interface CorrectedAgeResult extends AgeResult {
+  type: 'corrected';
+  description: string;
+  prematurityOffset: number;
+  isNegative: boolean;
+  wouldReachTermAt: Date;
+}
 
-### 2. Post-term Birth
-- **Scenario**: Infant born after 42 weeks gestation
-- **Handling**: Use actual gestational age, note post-term status
-- **Calculation**: Proceeds normally, corrected age will be older than chronological age
+const calculateCorrectedAge = (
+  birthDate: Date,
+  gestationalAge: GestationalAge,
+  currentDate: Date
+): CorrectedAgeResult => {
+  // Type-safe calculation with comprehensive error handling
+  const chronologicalDays = dayjs(currentDate).diff(dayjs(birthDate), 'days');
+  const fullTermDays = 40 * 7; // 280 days
+  const prematurityOffset = fullTermDays - gestationalAge.totalDays;
+  const correctedDays = chronologicalDays - prematurityOffset;
+  
+  const ageFormatted = formatAgeResult(correctedDays);
+  const termDate = dayjs(birthDate).add(prematurityOffset, 'days').toDate();
+  
+  return {
+    ...ageFormatted,
+    type: 'corrected',
+    description: 'Age adjusted for prematurity (if born at full term)',
+    prematurityOffset,
+    isNegative: correctedDays < 0,
+    wouldReachTermAt: termDate
+  };
+};
+```
 
-### 3. Leap Years
-- **Consideration**: February 29th handling
-- **Implementation**: Use proper date arithmetic libraries
-- **Testing**: Include leap year test cases
+**TypeScript Calculation Steps**:
+```typescript
+// All calculations with strict type checking
+const FULL_TERM_DAYS = 280 as const;
+const DAYS_PER_WEEK = 7 as const;
 
-### 4. Time Zones
-- **Approach**: Use local dates only, avoid time zone complications
-- **Implementation**: Date-only calculations, no time components
+type CalculationStep = {
+  gestationalDays: number;      // GA_weeks * 7 + GA_days
+  prematurityOffset: number;    // 280 - gestationalDays  
+  chronologicalDays: number;    // dayjs diff calculation
+  correctedDays: number;        // chronologicalDays - offset
+};
+```
+
+**Type-Safe Edge Case Handling**:
+- Negative corrected age properly typed and handled
+- Term/post-term infants with type guards
+- Calculation validation with comprehensive error types
+
+### 3. Postmenstrual Age (TypeScript Implementation)
+```typescript
+interface PostmenstrualAgeResult extends AgeResult {
+  type: 'postmenstrual';
+  description: string;
+  isTermEquivalent: boolean;
+  daysToTerm: number;
+  termDate: Date;
+}
+
+const calculatePostmenstrualAge = (
+  birthDate: Date,
+  gestationalAge: GestationalAge,
+  currentDate: Date
+): PostmenstrualAgeResult => {
+  const chronologicalDays = dayjs(currentDate).diff(dayjs(birthDate), 'days');
+  const pmaDays = gestationalAge.totalDays + chronologicalDays;
+  
+  const ageFormatted = formatAgeResult(pmaDays);
+  const fullTermDays = 40 * 7;
+  const isTermEquivalent = pmaDays >= fullTermDays;
+  const daysToTerm = Math.max(0, fullTermDays - pmaDays);
+  const termDate = dayjs(birthDate).add(fullTermDays - gestationalAge.totalDays, 'days').toDate();
+  
+  return {
+    ...ageFormatted,
+    type: 'postmenstrual',
+    description: 'Total time since onset of last menstrual period',
+    isTermEquivalent,
+    daysToTerm,
+    termDate
+  };
+};
+```
+
+**Type-Safe PMA Calculation**:
+```typescript
+type PMACalculation = {
+  gestationalDays: number;     // GA_weeks * 7 + GA_days
+  chronologicalDays: number;   // dayjs().diff() calculation  
+  pmaDays: number;            // gestationalDays + chronologicalDays
+  pmaWeeks: number;           // Math.floor(pmaDays / 7)
+  pmaRemainderDays: number;   // pmaDays % 7
+};
+```
+
+## TypeScript Edge Cases and Special Scenarios
+
+### 1. Negative Corrected Age (Type-Safe Handling)
+```typescript
+interface NegativeCorrectedAge {
+  isNegative: true;
+  explanation: string;
+  daysUntilTerm: number;
+  displayWarning: boolean;
+}
+
+const handleNegativeCorrectedAge = (correctedDays: number): NegativeCorrectedAge | null => {
+  if (correctedDays >= 0) return null;
+  
+  return {
+    isNegative: true,
+    explanation: 'Infant has not yet reached their original due date',
+    daysUntilTerm: Math.abs(correctedDays),
+    displayWarning: Math.abs(correctedDays) > 98 // > 14 weeks negative
+  };
+};
+```
+
+### 2. Post-term Birth (Type Guards)
+```typescript
+type BirthTerm = 'extremely-preterm' | 'very-preterm' | 'moderate-preterm' | 'late-preterm' | 'term' | 'post-term';
+
+const getBirthTermCategory = (weeks: number): BirthTerm => {
+  if (weeks < 28) return 'extremely-preterm';
+  if (weeks < 32) return 'very-preterm';
+  if (weeks < 34) return 'moderate-preterm';
+  if (weeks < 37) return 'late-preterm';
+  if (weeks <= 42) return 'term';
+  return 'post-term';
+};
+```
+
+### 3. Date Handling (Day.js Integration)
+```typescript
+// Robust date handling with TypeScript
+const calculateDaysBetween = (startDate: Date, endDate: Date): number => {
+  return dayjs(endDate).diff(dayjs(startDate), 'days', true); // precise calculation
+};
+
+// Leap year handling built into dayjs
+const isLeapYear = (date: Date): boolean => {
+  return dayjs(date).isLeapYear();
+};
+```
 
 ## Precision and Rounding
 
