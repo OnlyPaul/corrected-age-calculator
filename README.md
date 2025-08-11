@@ -1,189 +1,98 @@
-# Corrected Age Calculator
+# Neonatal Age Tools
 
-A medical tool for calculating corrected age and postmenstrual age for preterm infants. Built as a static web application for healthcare professionals and parents.
+A clinical calculator for computing corrected age, postmenstrual age (PMA), and postnatal age (PNA) for neonatal and pediatric patients. This tool is designed for healthcare professionals working with premature infants and provides clinically accurate age calculations following established medical guidelines.
 
-## 🚀 Quick Start
+## Features
 
-1. **Open the calculator**: Open `index.html` in any modern web browser
-2. **Enter information**:
-   - Date of birth
-   - Gestational age at birth (weeks + days)
-   - Calculation date (defaults to today)
-3. **Calculate**: Click "Calculate Ages" to see results
-4. **View results**: See corrected age, postmenstrual age, and developmental guidance
+- **Corrected Age Calculator**: Adjusts chronological age for prematurity by accounting for gestational age at birth
+- **Postmenstrual Age (PMA)**: Calculates gestational age + postnatal age for medication dosing and clinical assessments
+- **Postnatal Age (PNA)**: Standard chronological age since birth
+- **Clinical Guidelines**: Built-in reference information about when and how to use each age calculation
+- **Privacy-First**: All calculations performed locally in the browser - no patient data transmitted or stored
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
+- **Dark/Light Mode**: Comfortable viewing in any clinical environment
 
-## 📋 Features
+## Clinical Use Cases
 
-### Core Calculations
-- **Corrected Age**: Age adjusted for prematurity (if born at full term)
-- **Postmenstrual Age**: Total time since onset of last menstrual period
-- **Chronological Age**: Actual time elapsed since birth (for reference)
+This calculator is particularly useful for:
 
-### User Experience
-- 📱 **Mobile-first responsive design**
-- ♿ **WCAG 2.1 AA accessibility compliance**
-- 🔒 **Privacy-first**: No data storage or transmission
-- 📚 **Educational content** with medical explanations
-- 🖨️ **Print-friendly results**
+- **Developmental Assessments**: Use corrected age for milestone tracking in premature infants
+- **Growth Monitoring**: Plot corrected age on growth charts for accurate assessment
+- **Medication Dosing**: Use PMA for age-dependent drug protocols in neonatal care
+- **Clinical Documentation**: Ensure consistent age calculations across healthcare teams
+- **Parent Education**: Help families understand their premature infant's development timeline
 
-### Medical Features
-- ✅ **Medically accurate formulas** based on established standards
-- ⚠️ **Smart validation** with warnings for edge cases
-- 🎯 **Developmental guidance** appropriate for age and prematurity level
-- 📊 **Multiple age formats** (weeks/days, months, years)
+## Usage
 
-## 🏗️ Project Structure
+1. **Enter Birth Date**: The infant's actual date of birth
+2. **Set Assessment Date**: Date for calculation (defaults to today)
+3. **Input Gestational Age**: Weeks and days at birth (22-42 weeks supported)
+4. **Choose Correction**: Toggle corrected age calculation (recommended for premature infants < 37 weeks)
 
+The calculator will display:
+- Postnatal age in weeks and days
+- Postmenstrual age in weeks and days  
+- Corrected age in weeks/days and calendar format (years, months, weeks, days)
+
+## Clinical Guidelines
+
+- **Corrected Age**: Recommended for premature infants (< 37 weeks GA) until 24 months of age
+- **Term Reference**: Uses 40 weeks gestational age as the term reference point
+- **Immunizations**: Always use chronological age (PNA), not corrected age, for vaccination schedules
+- **Documentation**: Follow your institution's specific protocols for age reporting
+
+## Technology Stack
+
+Built with modern web technologies for reliability and performance:
+
+- **React 19** with TypeScript for type-safe development
+- **Material-UI (MUI)** for professional clinical interface design
+- **Vite** for fast development and optimized builds
+- **date-fns** for robust date calculations
+- **Zod** for input validation and data integrity
+- **React Hook Form** for efficient form handling
+
+## Development
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+
+### Setup
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd draft
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
-corrected-age-calculator/
-├── index.html              # Main application
-├── css/
-│   ├── styles.css          # Core styling
-│   └── responsive.css      # Mobile responsiveness
-├── js/
-│   ├── calculator.js       # Calculation engine
-│   ├── ui.js              # User interface
-│   ├── validation.js      # Input validation
-│   └── utils.js           # Utility functions
-├── assets/
-│   └── favicon.svg        # Site icon
-├── tests/
-│   ├── calculator.test.js # Calculator tests
-│   ├── validation.test.js # Validation tests
-│   └── test-runner.html   # Browser test runner
-├── design-docs/           # Comprehensive documentation
-└── README.md             # This file
-```
 
-## 🧪 Testing
+### Available Scripts
 
-### Run Tests in Browser
-1. Open `tests/test-runner.html` in your browser
-2. Click "Run All Tests" to execute the full test suite
-3. Individual test suites can be run separately
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Build optimized production bundle
+- `npm run lint` - Run ESLint for code quality
+- `npm run preview` - Preview production build locally
 
-### Test Coverage
-- **Unit Tests**: Core calculation logic and validation
-- **Integration Tests**: Component interaction
-- **Edge Cases**: Boundary conditions and error handling
-- **Performance Tests**: Calculation speed verification
+## Privacy & Security
 
-### Test Results
-All tests must pass for medical accuracy:
-- ✅ Chronological age calculations
-- ✅ Corrected age formulas (including negative ages)
-- ✅ Postmenstrual age calculations
-- ✅ Input validation and error handling
-- ✅ Edge cases (leap years, extreme prematurity, etc.)
+- **Local Processing**: All calculations performed in your browser
+- **No Data Collection**: No personal or medical information is transmitted or stored
+- **HIPAA Compliant**: Tool processes no PHI and can be used in clinical environments
+- **Offline Capable**: Works without internet connection once loaded
 
-## 📖 Medical Background
+## Medical Disclaimer
 
-### What is Corrected Age?
-Corrected age (adjusted age) is the age a preterm infant would be if they had been born at full term (40 weeks gestation). It's essential for:
-- Assessing developmental milestones
-- Timing medical interventions
-- Providing appropriate developmental expectations
-
-**Formula**: `Corrected Age = Chronological Age - (40 weeks - Gestational Age at Birth)`
-
-### What is Postmenstrual Age?
-Postmenstrual age (PMA) represents the total time since the onset of the mother's last menstrual period.
-
-**Formula**: `PMA = Gestational Age at Birth + Chronological Age`
-
-### When to Use Corrected Age
-- **Highly relevant**: Very preterm infants (<32 weeks) up to 2-3 years
-- **Moderately relevant**: Late preterm infants (32-37 weeks) up to 1-2 years
-- **Limited relevance**: Term infants (≥37 weeks) or children >3 years
-
-## 🔧 Technical Details
-
-### Browser Support
-- Chrome 80+ (2020)
-- Firefox 75+ (2020)
-- Safari 13+ (2019)
-- Edge 80+ (2020)
-
-### Technologies Used
-- **HTML5**: Semantic structure and accessibility
-- **CSS3**: Modern styling with CSS Grid and Flexbox
-- **Vanilla JavaScript**: No dependencies for maximum compatibility
-- **Progressive Enhancement**: Works without JavaScript for basic functionality
-
-### Performance Targets
-- ⚡ Page load: <2 seconds on 3G
-- 🔄 Calculation time: <100ms
-- 💾 Memory usage: <10MB
-- 📱 Touch targets: ≥44px minimum
-
-### Accessibility Features
-- Semantic HTML structure
-- ARIA labels and live regions
-- Keyboard navigation support
-- Screen reader compatibility
-- High contrast mode support
-- Focus management
-
-## 🚀 Deployment
-
-### GitHub Pages (Recommended)
-1. Push code to GitHub repository
-2. Enable GitHub Pages in repository settings
-3. Select source branch (usually `main`)
-4. Access via `https://yourusername.github.io/corrected-age-calculator`
-
-### Other Static Hosting
-Works with any static hosting service:
-- Netlify
-- Vercel
-- AWS S3
-- Firebase Hosting
-
-### Local Development
-Simply open `index.html` in a web browser. No build process required.
-
-## 📚 Documentation
-
-Comprehensive design documentation is available in the `design-docs/` folder:
-
-- **01-project-overview.md**: Purpose and requirements
-- **02-calculation-specifications.md**: Mathematical formulas
-- **03-technical-specification.md**: Implementation details
-- **04-ui-ux-design.md**: Interface design
-- **05-testing-strategy.md**: Testing approach
-
-## ⚠️ Medical Disclaimer
-
-**Important**: This calculator is for educational and informational purposes only. Always consult with qualified healthcare professionals for medical decisions. The calculations provided should not replace professional medical advice, diagnosis, or treatment.
-
-## 🤝 Contributing
-
-This project welcomes contributions, especially from:
-- Healthcare professionals (for medical accuracy review)
-- Accessibility experts (for WCAG compliance)
-- Parents of preterm infants (for usability feedback)
-
-### Development Guidelines
-1. All changes must pass the test suite
-2. Medical calculations require professional validation
-3. Maintain WCAG 2.1 AA accessibility compliance
-4. Follow mobile-first responsive design principles
-
-## 📄 License
-
-This project is released under the MIT License. See LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- Medical formulas based on established pediatric and neonatal standards
-- Accessibility guidelines from WCAG 2.1
-- UI/UX principles from healthcare design best practices
-- Testing approach inspired by medical device validation standards
-
----
-
-**Version**: 1.0  
-**Last Updated**: December 2024  
-**Medical Review**: Pending (recommended before clinical use)
-
-For questions, issues, or medical review requests, please open an issue in the repository.
+This calculator is for educational and clinical reference purposes. Always consult with qualified healthcare professionals for medical decisions and follow your institution's specific protocols and guidelines. The tool provides calculations based on established clinical formulas but should not replace clinical judgment.

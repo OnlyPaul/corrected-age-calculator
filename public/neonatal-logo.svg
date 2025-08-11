@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="babyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4FC3F7"/>
+      <stop offset="100%" stop-color="#29B6F6"/>
+    </linearGradient>
+    <linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7043"/>
+      <stop offset="100%" stop-color="#FF5722"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Baby head/body -->
+  <circle cx="16" cy="14" r="8" fill="url(#babyGradient)" stroke="#0277BD" stroke-width="0.5"/>
+  
+  <!-- Baby face features -->
+  <circle cx="13.5" cy="12" r="1" fill="#01579B" opacity="0.8"/>
+  <circle cx="18.5" cy="12" r="1" fill="#01579B" opacity="0.8"/>
+  <path d="M 14 16 Q 16 17.5 18 16" stroke="#01579B" stroke-width="1" fill="none" stroke-linecap="round"/>
+  
+  <!-- Medical cross/plus symbol -->
+  <rect x="15" y="24" width="2" height="6" fill="url(#heartGradient)" rx="1"/>
+  <rect x="12" y="27" width="8" height="2" fill="url(#heartGradient)" rx="1"/>
+  
+  <!-- Small heart accent -->
+  <path d="M 8 8 C 7 7 6 7 6 8.5 C 6 9 8 11 8 11 C 8 11 10 9 10 8.5 C 10 7 9 7 8 8 Z" fill="url(#heartGradient)" opacity="0.9"/>
+  
+  <!-- Subtle glow effect -->
+  <circle cx="16" cy="14" r="8" fill="none" stroke="rgba(79, 195, 247, 0.3)" stroke-width="1.5"/>
+</svg>

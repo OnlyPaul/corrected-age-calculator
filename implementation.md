@@ -1,406 +1,205 @@
-# Implementation Plan - Corrected Age Calculator (React TypeScript)
+### Implementation Plan: React TypeScript App for Corrected Age and Postmenstrual Age (PMA)
 
-## Overview
-This implementation plan outlines the development of a modern React TypeScript application for calculating corrected age and postmenstrual age for infants. The application features Material UI components, comprehensive type safety, and modern development practices for healthcare professionals and parents.
+#### 1) Objective and Scope
+- **Goal**: Build a modern, accessible, highly accurate calculator that computes corrected age and postmenstrual age for infants, designed for healthcare professionals and parents.
+- **Primary outputs**:
+  - Postnatal age (time since birth)
+  - Postmenstrual age (PMA)
+  - Corrected age (aka adjusted age) for prematurity
+- **Platforms**: Web (desktop and mobile). Optional PWA later.
+- **Target audience**: Neonatologists, pediatricians, therapists, nurses, and parents.
 
-## Technology Stack
-- **Frontend**: React 18, TypeScript 5, Material UI 5
-- **Build Tool**: Vite for fast development and optimized builds
-- **State Management**: React Context API with hooks
-- **Date Handling**: Day.js with MUI Date Pickers
-- **Testing**: Vitest, React Testing Library, Jest DOM
-- **Linting**: ESLint with TypeScript rules
-- **Deployment**: Vercel/Netlify (static hosting with modern CI/CD)
-- **Version Control**: Git with GitHub
+#### 2) Domain definitions and formulas
+- **Gestational Age at birth (GA_birth)**: Age of the fetus at birth in weeks and days.
+- **Postnatal age (PNA)**: Time elapsed since the date of birth.
+  - PNA_days = differenceInCalendarDays(assessmentDateUTC, birthDateUTC)
+- **Postmenstrual Age (PMA)**: GA_birth + PNA, typically expressed in weeks+days.
+  - PMA_days = GA_birth_days + PNA_days
+  - PMA_wk = floor(PMA_days / 7), PMA_d = PMA_days % 7
+- **Corrected age (CA)**: Chronological age adjusted for prematurity, typically used until 24 months for infants born < 37 weeks GA.
+  - term_days = 40 * 7 (using 40 weeks as term reference)
+  - prematurity_deficit_days = max(0, term_days - GA_birth_days)
+  - CA_days = max(0, PNA_days - prematurity_deficit_days)
+  - For calendar-based year/month/day representation, compute correctedBirthDate = addDays(birthDate, prematurity_deficit_days), then CA = interval(assessmentDate, correctedBirthDate) with calendar math.
 
-## Project Structure
-```
-corrected-age-calculator/
-├── index.html                    # Entry point HTML
-├── package.json                  # Dependencies and scripts
-├── vite.config.ts               # Vite configuration
-├── tsconfig.json                # TypeScript configuration
-├── src/
-│   ├── main.tsx                 # React application entry point
-│   ├── App.tsx                  # Main App component
-│   ├── components/              # Reusable UI components
-│   │   ├── Calculator/          # Calculator form components
-│   │   │   ├── CalculatorForm.tsx
-│   │   │   ├── DateInput.tsx
-│   │   │   └── GestationalAgeInput.tsx
-│   │   ├── Results/             # Results display components
-│   │   │   ├── ResultsDisplay.tsx
-│   │   │   ├── AgeResult.tsx
-│   │   │   └── AdditionalInfo.tsx
-│   │   ├── Layout/              # Layout components
-│   │   │   ├── Header.tsx
-│   │   │   ├── Footer.tsx
-│   │   │   └── HelpPanel.tsx
-│   │   └── Common/              # Common UI components
-│   │       ├── LoadingSpinner.tsx
-│   │       └── ErrorAlert.tsx
-│   ├── hooks/                   # Custom React hooks
-│   │   ├── useCalculator.ts     # Calculator state management
-│   │   ├── useValidation.ts     # Form validation
-│   │   └── useLocalStorage.ts   # Local storage utility
-│   ├── lib/                     # Core business logic
-│   │   ├── calculator.ts        # Age calculation engine
-│   │   ├── validation.ts        # Input validation logic
-│   │   └── utils.ts            # Utility functions
-│   ├── types/                   # TypeScript type definitions
-│   │   ├── calculator.ts        # Calculator-related types
-│   │   └── validation.ts        # Validation types
-│   ├── theme/                   # Material UI theme
-│   │   ├── theme.ts            # Custom theme configuration
-│   │   └── components.ts       # Component style overrides
-│   └── __tests__/              # Test files
-│       ├── components/         # Component tests
-│       ├── lib/               # Logic tests
-│       └── hooks/             # Hook tests
-├── public/
-│   └── assets/                 # Static assets
-│       ├── favicon.svg
-│       └── icons/
-└── docs/                       # Documentation
-    └── README.md              # User documentation
-```
+Notes and clinical conventions:
+- Correction generally applied if GA_birth < 37w0d and commonly up to 24 months postnatal age.
+- Always show the underlying assumptions and allow toggling correction on/off with a clear explanation.
+- Time computations should use UTC-safe calculations based on days to avoid DST issues.
 
-## Implementation Phases
+#### 3) User stories and acceptance criteria
+- As a clinician, I can enter birth date, assessment date (defaults to today), and GA at birth (weeks+days) to see PNA, PMA, and corrected age.
+  - AC: Results update instantly with clear units; precision: weeks+days and calendar Y/M/D for corrected age.
+- As a parent, I can read plain-language explanations and see whether correction applies and until what age.
+  - AC: An info panel explains terms, assumptions, and when to use corrected age.
+- As any user, I can copy a shareable link capturing inputs and results.
+  - AC: Query params reflect inputs; opening the URL restores the state and recalculates.
+- As a user, I can save common cases locally and revisit them.
+  - AC: Saved cases persist in localStorage and can be loaded/deleted.
+- As an accessibility user, I can operate the app by keyboard and screen reader.
+  - AC: All interactive elements are focusable, labeled, and have visible focus states; contrast meets WCAG AA.
 
-### Phase 1: Core Foundation (Week 1)
-**Goal**: React TypeScript foundation with Material UI
+#### 4) Tech stack and libraries
+- React 18 + TypeScript, Vite
+- Material UI (MUI): `@mui/material`, `@mui/icons-material`, theming
+- Date picker: `@mui/x-date-pickers` with `AdapterDateFns` (v3)
+- Date utilities: `date-fns` (+ `date-fns-tz` if needed)
+- Forms and validation: `react-hook-form`, `zod`, `@hookform/resolvers/zod`
+- Testing: `vitest`, `@testing-library/react`, `@testing-library/user-event`, `jsdom`
+- Lint/format: ESLint (TS), Prettier
+- Optional: `zod-to-ts` (if generating types elsewhere), `msw` (future API mocks)
 
-#### Tasks:
-1. **Project Setup**
-   - Initialize React TypeScript project with Vite
-   - Configure TypeScript, ESLint, and Vitest
-   - Set up Material UI theme and dependencies
-   - Initialize Git repository and CI/CD pipeline
+#### 5) Architecture and project structure
+- Feature-first, domain-oriented structure:
+  - `src/domain/` domain logic (pure functions for age math, types, validators)
+  - `src/components/` reusable UI (inputs, results cards)
+  - `src/features/age-calculator/` feature composition (form + results + info)
+  - `src/hooks/` shared hooks (query param sync, localStorage helpers)
+  - `src/styles/` theme setup
+  - `src/pages/` top-level route(s)
+- Keep domain logic UI-agnostic and fully unit tested.
 
-2. **Type Definitions (`src/types/`)**
-   - Define TypeScript interfaces for calculator data structures
-   - Create validation result types
-   - Define component prop interfaces
-   - Set up strict type checking
+#### 6) Data modeling and types (TypeScript)
+- `AgeInDays` (number)
+- `WeeksDays` { weeks: number; days: number }
+- `GestationalAge` { weeks: number; days: number } (days in [0..6], weeks in [22..42])
+- `AgeBreakdown` { years: number; months: number; weeks: number; days: number }
+- `CalculatorInputs` { birthDate: Date; assessmentDate: Date; gaBirth: GestationalAge; useCorrection: boolean }
+- `CalculatorResults` { pna: WeeksDays; pnaDays: number; pma: WeeksDays; pmaDays: number; corrected: { weeksDays: WeeksDays; days: number; calendar: AgeBreakdown } }
 
-3. **Core Calculation Engine (`src/lib/calculator.ts`)**
-   - `calculateChronologicalAge(): ChronologicalAgeResult`
-   - `calculateCorrectedAge(): CorrectedAgeResult`
-   - `calculatePostmenstrualAge(): PostmenstrualAgeResult`
-   - Type-safe date utility functions
-   - Age formatting with proper TypeScript types
+#### 7) Algorithms and utilities
+- Utilities in `src/domain/age`: 
+  - `toDaysFromWeeksDays(weeksDays: WeeksDays): number`
+  - `toWeeksDaysFromDays(days: number): WeeksDays`
+  - `calcPnaDays(birthDate: Date, assessmentDate: Date): number` (UTC diff in calendar days)
+  - `calcPmaDays(gaBirthDays: number, pnaDays: number): number`
+  - `calcCorrectionDays(gaBirthDays: number, termWeeks: number = 40): number`
+  - `calcCorrectedAgeDays(pnaDays: number, correctionDays: number): number`
+  - `calcCalendarBreakdownFromCorrected(birthDate: Date, correctionDays: number, assessmentDate: Date): AgeBreakdown` using date-fns intervalToDuration
+- All functions pure, with unit tests and explicit input validation.
 
-4. **Input Validation (`src/lib/validation.ts`)**
-   - Type-safe validation functions
-   - Custom validation hooks
-   - Material UI form integration
-   - Comprehensive error handling with types
+Pseudo-flow for calculation:
+1) Normalize all dates to UTC midnight.
+2) pnaDays = differenceInCalendarDays(assessment, birth)
+3) gaBirthDays = toDaysFromWeeksDays(gaBirth)
+4) pmaDays = gaBirthDays + pnaDays
+5) correctionDays = useCorrection ? max(0, 280 - gaBirthDays) : 0
+6) correctedDays = max(0, pnaDays - correctionDays)
+7) correctedWeeksDays = toWeeksDaysFromDays(correctedDays)
+8) correctedCalendar = interval between (assessment, addDays(birth, correctionDays))
 
-**Deliverables**: Working React TypeScript foundation with type-safe calculator logic
+#### 8) UI and interaction design (MUI)
+- Layout: responsive container with top app bar, form on top, results below, info drawer.
+- Components:
+  - `AgeCalculatorForm`: 
+    - Birth date (MUI Date Picker)
+    - Assessment date (MUI Date Picker, default Today)
+    - GA at birth: weeks (TextField with stepper) + days (0–6)
+    - Toggle: Apply correction (default on if GA < 37w)
+    - Validation feedback inline
+  - `ResultsCard`:
+    - PNA: weeks+days (and total days)
+    - PMA: weeks+days
+    - Corrected age: weeks+days plus calendar Y/M/D
+    - Badges for “Correction applied” and “Recommended until 24 months”
+  - `InfoPanel` or drawer: concise explanations + references
+  - `SavedCasesPanel`: list + load/delete; share button creates URL with query params
+- Theming: light/dark mode toggle; high-contrast colors meeting WCAG AA.
 
-### Phase 2: User Interface & Experience (Week 2)
-**Goal**: Material UI components with excellent UX
+#### 9) Validation and error handling
+- `zod` schema for `CalculatorInputs`:
+  - Dates are valid, birth <= assessment, assessment not absurdly far from birth (e.g., < 10 years)
+  - GA weeks in [22..42], days in [0..6]
+  - If GA >= 37w => default correction off; allow manual toggle
+- User feedback via MUI `FormHelperText`, `Alert` for cross-field errors.
 
-#### Tasks:
-1. **Material UI Theme (`src/theme/`)**
-   - Custom theme configuration with medical color palette
-   - Typography scale using Material UI theme
-   - Component style overrides for medical application
-   - Responsive breakpoint configuration
+#### 10) State management and persistence
+- `react-hook-form` for form state + zod resolver
+- URL query params sync (birthDate, assessmentDate, gaWeeks, gaDays, useCorrection)
+- Local persistence for saved cases via localStorage with versioned schema key
 
-2. **React Components (`src/components/`)**
-   - `CalculatorForm` with Material UI inputs and validation
-   - `DateInput` using MUI DatePicker with proper formatting
-   - `GestationalAgeInput` with custom number inputs
-   - `ResultsDisplay` with Material UI Cards and Typography
-   - Responsive Grid layout using MUI Grid system
+#### 11) Date/time correctness
+- Use UTC-based date math for day-level diffs (no time-of-day inputs)
+- Normalize all dates to startOfDay UTC prior to diff
+- Consider leap years (date-fns handles calendar math); avoid timezone surprises
 
-3. **Custom Hooks (`src/hooks/`)**
-   - `useCalculator` for state management
-   - `useValidation` for real-time form validation
-   - `useLocalStorage` for persisting user preferences
-   - Type-safe hook implementations
+#### 12) Accessibility and i18n
+- Labels, roles, and descriptions on all inputs
+- Keyboard navigable, visible focus, semantic structure
+- Announce calculation updates via polite `aria-live` region
+- i18n-ready formatting for dates and units; English first, design for easy locale expansion
 
-4. **User Experience Enhancements**
-   - Material UI loading states (CircularProgress, Skeleton)
-   - Snackbar notifications for success/error states
-   - Material UI tooltips and help content
-   - Smooth transitions and animations
+#### 13) Testing strategy
+- Unit tests (domain): all utilities with table-driven cases
+- Component tests: form validation, rendering of results, URL param restoration
+- Accessibility checks: axe (optional) for basic violations
+- Example test cases:
+  - GA 30w0d, PNA 10w0d => PMA 40w0d, CorrectedAge 0w0d
+  - GA 32w3d, PNA 8w4d => PMA 41w0d, Correction = (40w0d - 32w3d) = 7w4d, CorrectedAge = 1d
+  - GA 38w0d, PNA 6w2d => PMA 44w2d, Correction default off
+  - Birth today, GA 35w0d, assessment today => PMA 35w0d, CorrectedAge 0
 
-**Deliverables**: Complete Material UI interface with React best practices
+#### 14) Security and privacy
+- No PHI is sent to any server; compute locally only
+- No analytics by default; user-consent gate for future telemetry
+- Clear privacy note in info panel
 
-### Phase 3: Advanced Features (Week 3)
-**Goal**: Enhanced functionality with React patterns
+#### 15) CI/CD and quality gates
+- Pre-commit checks: typecheck, lint, test
+- CI pipeline (GitHub Actions): install, typecheck, lint, test, build
+- Build artifacts: static site
 
-#### Tasks:
-1. **Advanced React Patterns**
-   - Context API for global state management
-   - Error boundaries for robust error handling
-   - Suspense for lazy loading components
-   - Advanced TypeScript patterns (generics, conditional types)
+#### 16) Project tasks and milestones
+Milestone 1: Domain foundation (1–2 days)
+- [x] Set up dependencies (MUI, pickers, date-fns, RHF, zod, testing libs)
+- [x] Implement domain utilities in `src/domain/age`
+- [x] Define types and zod schemas
 
-2. **Accessibility Implementation**
-   - Material UI accessibility features integration
-   - ARIA live regions with React refs
-   - Keyboard navigation with React focus management
-   - High contrast theme variants in Material UI
-   - Screen reader optimized component structure
+Milestone 2: UI skeleton and form (1–2 days)
+- [x] MUI theme + layout scaffold
+- [x] `AgeCalculatorForm` with RHF + zod
+- [x] Live calculations wired to results (no persistence yet)
 
-3. **Educational Content Components**
-   - `HelpPanel` with expandable Material UI Accordion
-   - `InfoDialog` for detailed explanations
-   - Interactive examples with live calculations
-   - Responsive help content for mobile/desktop
+Milestone 3: Results and UX polish (1–2 days)
+- [x] `ResultsCard` with formatted outputs and badges
+- [x] Info panel with explanations and references
+- [x] Accessibility pass (labels, aria-live, keyboard)
 
-4. **Progressive Web App Features**
-   - Vite PWA plugin integration
-   - React service worker hooks
-   - Offline state management with React
-   - App shell caching strategy
+Milestone 4: Persistence and shareability (1 day)
+- [ ] Query param sync and restore
+- [ ] Saved cases with localStorage
 
-**Deliverables**: Advanced React application with comprehensive accessibility
+Milestone 5: Hardening and release (1 day)
+- [ ] Full test coverage for core paths
+- [ ] Error states and boundary cases
+- [ ] CI pipeline and production build
 
-### Phase 4: Testing & Optimization (Week 4)
-**Goal**: Production-ready React TypeScript application
+#### 17) References (to surface in Info panel)
+- AAP/CDC guidance on corrected age usage up to 24 months for preterm infants
+- Neonatal clinical practice references for PMA and corrected age definitions
 
-#### Tasks:
-1. **Comprehensive Testing**
-   - Vitest unit tests for calculation logic with full TypeScript coverage
-   - React Testing Library component tests
-   - Integration tests using MSW (Mock Service Worker)
-   - E2E testing with Playwright
-   - TypeScript strict mode validation
+#### 18) Implementation notes (dev tips)
+- Represent ages in days internally; convert to display units at the edge
+- Prefer `intervalToDuration` for calendar Y/M/D of corrected age based on correctedBirthDate
+- Keep domain pure and tested; UI should be a thin layer
+- Provide clear copywriting and unit labels (e.g., “weeks + days”, “years · months · days”)
 
-2. **Performance Optimization**
-   - Vite bundle analysis and code splitting
-   - React.memo and useMemo optimization
-   - Material UI tree shaking configuration
-   - Image optimization with Vite plugins
-   - Lighthouse performance auditing
+---
 
-3. **Security & Privacy**
-   - TypeScript strict null checks for security
-   - Vite environment variable handling
-   - Content Security Policy for modern build
-   - React security best practices audit
+### Concrete next steps (initial commands and files)
+- Add packages:
+  - `@mui/material @mui/icons-material @emotion/react @emotion/styled @mui/x-date-pickers date-fns react-hook-form zod @hookform/resolvers vitest @testing-library/react @testing-library/user-event jsdom`
+- Create files:
+  - `src/domain/age/types.ts`
+  - `src/domain/age/utils.ts`
+  - `src/domain/age/utils.test.ts`
+  - `src/features/age-calculator/AgeCalculatorForm.tsx`
+  - `src/features/age-calculator/ResultsCard.tsx`
+  - `src/features/age-calculator/InfoPanel.tsx`
+  - `src/hooks/useQueryParams.ts`
+  - `src/hooks/useLocalStorage.ts`
+  - Integrate feature into `src/App.tsx`
 
-4. **Documentation & Deployment**
-   - TypeScript API documentation generation
-   - Storybook component documentation
-   - Vercel/Netlify deployment with preview environments
-   - Automated CI/CD with GitHub Actions
+This plan ensures accurate calculations, strong type safety, excellent accessibility, and a clean, maintainable architecture suitable for clinical and family use.
 
-**Deliverables**: Production-ready React TypeScript application with modern deployment
 
-## Key Implementation Details
-
-### Core Calculations with TypeScript
-```typescript
-// Type-safe implementation structure
-interface CalculationResults {
-  chronological: ChronologicalAgeResult;
-  corrected: CorrectedAgeResult;
-  postmenstrual: PostmenstrualAgeResult;
-  insights: CalculationInsights;
-}
-
-class AgeCalculator {
-  static calculateAges(
-    birthDate: Date,
-    gestationalAge: GestationalAge,
-    currentDate: Date
-  ): CalculationResults {
-    return {
-      chronological: this.calculateChronologicalAge(birthDate, currentDate),
-      corrected: this.calculateCorrectedAge(birthDate, gestationalAge, currentDate),
-      postmenstrual: this.calculatePostmenstrualAge(birthDate, gestationalAge, currentDate),
-      insights: this.generateInsights(/* ... */)
-    };
-  }
-}
-```
-
-### React Hook-based Validation Strategy
-```typescript
-const useValidation = () => {
-  const [errors, setErrors] = useState<ValidationErrors>({});
-  
-  const validateField = useCallback((field: string, value: any): ValidationResult => {
-    // Type-safe validation with comprehensive error handling
-  }, []);
-  
-  return { errors, validateField, clearErrors };
-};
-```
-
-### Material UI Responsive Design Approach
-```typescript
-const theme = createTheme({
-  breakpoints: {
-    values: { xs: 0, sm: 640, md: 1024, lg: 1280, xl: 1920 }
-  },
-  components: {
-    MuiTextField: {
-      styleOverrides: {
-        root: ({ theme }) => ({
-          [theme.breakpoints.down('sm')]: {
-            marginBottom: theme.spacing(2)
-          }
-        })
-      }
-    }
-  }
-});
-```
-
-### React Accessibility Features
-- Material UI built-in accessibility components
-- Custom hooks for ARIA live regions management
-- React focus management with useRef
-- Keyboard navigation with React event handlers
-- Material UI theme variants for high contrast support
-
-## Modern Deployment Strategy
-
-### Vercel/Netlify Deployment Configuration
-1. **Repository Setup**
-   - GitHub repository with main branch
-   - Automatic deployments on push
-   - Preview deployments for pull requests
-   - Branch protection rules
-
-2. **Build Process**
-   - Vite build system with TypeScript compilation
-   - Material UI production optimizations
-   - Tree shaking and code splitting
-   - Static asset optimization
-   - PWA manifest generation
-
-3. **Environment Configuration**
-   - Environment-specific configurations
-   - TypeScript strict mode in production
-   - Source map generation for debugging
-   - Performance monitoring integration
-
-### Modern Deployment Features
-- Edge function capabilities for advanced features
-- CDN distribution for global performance
-- Automatic HTTPS with SSL certificates
-- Analytics and performance monitoring
-- A/B testing infrastructure ready
-
-## Testing Strategy
-
-### Unit Testing (Vitest + TypeScript)
-```typescript
-// Type-safe testing with comprehensive coverage
-describe('AgeCalculator', () => {
-  it('should calculate corrected age correctly', () => {
-    const result: CorrectedAgeResult = AgeCalculator.calculateCorrectedAge(
-      new Date('2024-01-15'),
-      { weeks: 32, days: 0, totalDays: 224 },
-      new Date('2024-03-01')
-    );
-    expect(result.totalDays).toBe(-10);
-  });
-});
-```
-
-### Component Testing (React Testing Library)
-```typescript
-// Component integration testing
-test('CalculatorForm submits with valid data', async () => {
-  render(<CalculatorForm onSubmit={mockSubmit} />);
-  
-  await user.type(screen.getByLabelText(/birth date/i), '2024-01-15');
-  await user.click(screen.getByRole('button', { name: /calculate/i }));
-  
-  expect(mockSubmit).toHaveBeenCalledWith(expectedData);
-});
-```
-
-### E2E Testing (Playwright)
-- Complete user workflows
-- Cross-browser compatibility testing
-- Mobile device testing
-- Accessibility automation testing
-- Performance benchmarking
-
-## Quality Assurance
-
-### Code Quality
-- ESLint with TypeScript rules and React hooks plugin
-- Prettier with TypeScript support
-- Husky pre-commit hooks for code quality
-- Semantic versioning with conventional commits
-- Pull request reviews with TypeScript checks
-
-### Performance Targets
-- Lighthouse score: > 95 across all metrics
-- First Contentful Paint: < 1.5 seconds
-- TypeScript compilation: < 5 seconds
-- Bundle size: < 500KB gzipped
-- React component re-renders: optimized with React.memo
-
-### Accessibility Standards
-- WCAG 2.1 AA compliance with Material UI
-- Automated accessibility testing with jest-axe
-- Screen reader compatibility testing
-- Keyboard navigation with React focus management
-- Color contrast ratios > 4.5:1 in Material UI theme
-
-## Risk Mitigation
-
-### Technical Risks
-- **TypeScript Migration**: Comprehensive type coverage and strict mode
-- **Material UI Breaking Changes**: Version pinning and upgrade testing
-- **React Performance**: Bundle size monitoring and optimization
-- **Modern Browser Support**: Vite target configuration for optimal compatibility
-
-### User Experience Risks
-- **Medical Accuracy**: TypeScript ensures calculation consistency
-- **Component Accessibility**: Material UI built-in accessibility testing
-- **Mobile Performance**: React performance profiling and optimization
-
-### Deployment Risks
-- **Build Failures**: Robust CI/CD with TypeScript strict checks
-- **Environment Configuration**: Type-safe environment variable handling
-- **Third-party Dependencies**: Automated security scanning and updates
-
-## Success Metrics
-
-### Functional Metrics
-- 100% TypeScript type coverage with strict mode
-- Lighthouse performance score > 95
-- Zero critical accessibility violations (automated testing)
-- Modern browser compatibility (ES2020+ support)
-
-### User Experience Metrics
-- Material UI component consistency across all devices
-- React component render performance < 16ms
-- Bundle size < 500KB for fast loading
-- Zero reported TypeScript runtime errors
-
-## Post-Launch Considerations
-
-### Maintenance
-- Automated dependency updates with TypeScript compatibility checking
-- React and Material UI version upgrade testing
-- Performance monitoring with Core Web Vitals
-- Medical accuracy reviews with TypeScript-enforced consistency
-
-### Potential Enhancements
-- Internationalization with React i18n libraries
-- Advanced chart visualizations with React charting libraries
-- PDF export functionality with React PDF libraries
-- API integration capabilities with TypeScript interfaces
-
-## Timeline Summary
-- **Week 1**: React TypeScript foundation with Material UI setup
-- **Week 2**: Component development with comprehensive typing
-- **Week 3**: Advanced React patterns and accessibility implementation
-- **Week 4**: Testing, optimization, and modern deployment
-
-**Total Development Time**: 4 weeks for production-ready React TypeScript application
-
-This implementation plan provides a comprehensive roadmap for building a modern, type-safe, and medically accurate corrected age calculator using React TypeScript and Material UI, suitable for deployment on modern hosting platforms.
