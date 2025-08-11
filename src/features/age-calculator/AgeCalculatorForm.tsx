@@ -80,6 +80,7 @@ export function AgeCalculatorForm({
               render={({ field }) => (
                 <DatePicker
                   label="Birth date"
+                  format="dd/MM/yyyy"
                   value={field.value}
                   onChange={field.onChange}
                   slotProps={{
@@ -105,6 +106,7 @@ export function AgeCalculatorForm({
               render={({ field }) => (
                 <DatePicker
                   label="Assessment date"
+                  format="dd/MM/yyyy"
                   value={field.value}
                   onChange={field.onChange}
                   slotProps={{
