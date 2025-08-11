@@ -25,7 +25,10 @@ export interface CalculatorInputs {
 }
 
 export interface CalculatorResults {
-  pna: WeeksDays
+  pna: {
+    weeksDays: WeeksDays
+    calendar: AgeBreakdown
+  }
   pnaDays: number
   pma: WeeksDays
   pmaDays: number

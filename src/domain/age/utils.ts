@@ -97,6 +97,24 @@ export function calcCalendarBreakdownFromCorrected(
   return { years, months, weeks, days }
 }
 
+export function calcCalendarBreakdownFromBirth(
+  birthDate: Date,
+  assessmentDate: Date,
+): AgeBreakdown {
+  const birthUtc = toUtcStartOfDay(birthDate)
+  const assessmentUtc = toUtcStartOfDay(assessmentDate)
+  if (assessmentUtc.getTime() < birthUtc.getTime()) {
+    return { years: 0, months: 0, weeks: 0, days: 0 }
+  }
+  const duration = intervalToDuration({ start: birthUtc, end: assessmentUtc })
+  const years = duration.years ?? 0
+  const months = duration.months ?? 0
+  const daysTotal = duration.days ?? 0
+  const weeks = Math.floor(daysTotal / 7)
+  const days = daysTotal % 7
+  return { years, months, weeks, days }
+}
+
 export function validateGestationalAge(ga: GestationalAge): void {
   if (!Number.isFinite(ga.weeks) || !Number.isFinite(ga.days)) {
     throw new Error('Invalid gestational age')
@@ -121,6 +139,7 @@ export function computeCalculatorResults(inputs: CalculatorInputs): CalculatorRe
     correctionDays,
     inputs.assessmentDate,
   )
+  const pnaCalendar = calcCalendarBreakdownFromBirth(inputs.birthDate, inputs.assessmentDate)
 
   // Calculate metadata
   const gaBirthWeeks = inputs.gaBirth.weeks + inputs.gaBirth.days / 7
@@ -129,7 +148,10 @@ export function computeCalculatorResults(inputs: CalculatorInputs): CalculatorRe
   const correctionRecommendedUntilMonths = 24 // Standard clinical recommendation
 
   return {
-    pna: toWeeksDaysFromDays(pnaDays),
+    pna: {
+      weeksDays: toWeeksDaysFromDays(pnaDays),
+      calendar: pnaCalendar,
+    },
     pnaDays,
     pma: toWeeksDaysFromDays(pmaDays),
     pmaDays,

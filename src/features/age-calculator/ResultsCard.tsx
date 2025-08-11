@@ -2,10 +2,30 @@ import { Box, Chip, Divider, Grid, Paper, Stack, Typography } from '@mui/materia
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import InfoIcon from '@mui/icons-material/Info'
 import WarningIcon from '@mui/icons-material/Warning'
-import type { CalculatorResults } from '../../domain/age/types'
+import type { CalculatorResults, AgeBreakdown, WeeksDays } from '../../domain/age/types'
+
+function formatAgeDisplay(weeksDays: WeeksDays, calendar: AgeBreakdown): { primary: string; secondary: string } {
+  // If there are years or months, show the calendar format as primary
+  if (calendar.years > 0 || calendar.months > 0) {
+    const parts = []
+    if (calendar.years > 0) parts.push(`${calendar.years} y`)
+    if (calendar.months > 0) parts.push(`${calendar.months} mo`)
+    const primary = parts.join(' · ')
+    const secondary = `${weeksDays.weeks} wk ${weeksDays.days} d`
+    return { primary, secondary }
+  }
+  
+  // For younger babies, show weeks and days as primary
+  const primary = `${weeksDays.weeks} wk ${weeksDays.days} d`
+  const secondary = ''
+  return { primary, secondary }
+}
 
 export default function ResultsCard({ results }: { results: CalculatorResults }) {
   const { pna, pnaDays, pma, corrected, metadata } = results
+
+  // Format postnatal age display
+  const pnaDisplay = formatAgeDisplay(pna.weeksDays, pna.calendar)
 
   // Determine if correction should be recommended based on clinical guidelines
   const shouldRecommendCorrection = metadata.isPremature && !metadata.isCorrectionApplied
@@ -26,8 +46,8 @@ export default function ResultsCard({ results }: { results: CalculatorResults })
             }}>
             <Stat 
               label="Postnatal age" 
-              value={`${pna.weeks} wk ${pna.days} d`} 
-              sub={`${pnaDays} days total`}
+              value={pnaDisplay.primary} 
+              sub={pnaDisplay.secondary || `${pnaDays} days total`}
               description="Time since birth"
             />
           </Grid>
@@ -66,8 +86,7 @@ export default function ResultsCard({ results }: { results: CalculatorResults })
             }}>
             <Stat
               label="Corrected age (calendar)"
-              value={`${corrected.calendar.years} y · ${corrected.calendar.months} mo`}
-              sub={`${corrected.calendar.weeks} wk ${corrected.calendar.days} d`}
+              value={`${corrected.calendar.years} y · ${corrected.calendar.months} mo ${corrected.calendar.weeks} wk ${corrected.calendar.days} d`}
               description="Calendar representation of corrected age"
             />
           </Grid>
